@@ -1,0 +1,21 @@
+Installationsanleitung tensorflow compression
+=============================================
+
+1. PAKETE INSTALLIEREN
+-------------------
+
+pip install tensorflow-gpu==2.4 tensorflow-probability==0.12.1 tensorflow-compression==2.0b2
+
+2. KONTROLLE (optional)
+-----------------------
+
+python -m tensorflow_compression.all_tests
+
+# Bei erfolgreicher Installation sollte "OK (skipped=30)" oder Ähnliches am Ende zu sehen sein
+
+python
+
+import tensorflow as tf
+tf.test.is_gpu_available()
+
+# Falls GPU verfügbar ist, sollte "True" am Ende zu sehen sein
