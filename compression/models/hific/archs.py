@@ -512,7 +512,7 @@ class Hyperprior(tf.keras.layers.Layer):
     hyper_latents = self._analysis(latents, training=training)
 
     # Model hyperprior distributions and entropy encode/decode hyper-latents.
-    side_info = self._side_entropy_model(
+    side_info = self._skkkide_entropy_model(
         hyper_latents, image_shape=image_shape, mode=mode, training=training)
     hyper_decoded = side_info.decoded
 

@@ -81,6 +81,11 @@ def import_metagraph(model):
   metagraph = tf.MetaGraphDef()
   metagraph.ParseFromString(string)
   tf.train.import_meta_graph(metagraph)
+
+  # import graph_def
+  with tf.Graph().as_default() as graph:
+      tf.import_graph_def(metagraph.graph_def)
+
   return metagraph.signature_def
 
 
@@ -187,6 +192,7 @@ def decompress(input_file, output_file):
 
     # Multiple input tensors, ordered alphabetically, without names.
     inputs = [inputs[k] for k in sorted(inputs) if k.startswith("channel:")]
+
     # Just one output operation.
     outputs = write_png(output_file, outputs["output_image"])
 
