@@ -1,8 +1,8 @@
 '''
-    This script can be used to compress and decompress video files. The approach is based on the hific model. Actually,
-    to compress a video file, the video frames are separated and each frame will be compress using the hific model. All
-    the compress frames are exported into a bitstring and written to file. This file represents the compressed video. To
-    decompress a file, each frame is decompressed separately and the frames are fused into the final video file.
+    This script can be used to compress and decompress video files. The approach is based on the HiFiC model. To compress a video file,
+    the video frames are separated and each frame will be compressed using the hific model. All the compressed frames are exported
+    into a bitstring and written to a file. This file represents the compressed video. To decompress a file, each frame is decompressed
+    separately and the frames are fused into the final video file.
 '''
 import os
 import sys
@@ -18,7 +18,7 @@ from compression.models.tfci import import_metagraph, instantiate_signature
 
 USAGE_MESSAGE = '''
 Usage:
-    python hific_video_compression.py <command> <file>
+    python hific_video_compression.py <command> <inputfile> <outputfile>
     
 Commands:
     compress    Compresses a video file
