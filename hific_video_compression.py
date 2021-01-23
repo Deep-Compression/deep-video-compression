@@ -32,7 +32,7 @@ Examples:
 '''
 
 
-def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', end='\r'):
+def print_progress_bar(iteration, total, prefix='Progress:', suffix='Complete', decimals=2, length=50, fill='█', end='\r'):
     """
         Prints a progress bar to console.
 
@@ -81,7 +81,7 @@ def compress(input_file, output_file='compressed_video.dvc', model='hific-lo'):
         inputs = inputs['input_image']
         outputs = [outputs[k] for k in sorted(outputs) if k.startswith('channel:')]
 
-        print_progress_bar(0, num_frames, prefix='Progress:', suffix='Complete', length=50)
+        print_progress_bar(0, num_frames)
 
         with tf.Session() as sess:
             while success:
@@ -96,7 +96,7 @@ def compress(input_file, output_file='compressed_video.dvc', model='hific-lo'):
                 dictionary[str(n)] = packed.string
 
                 n += 1
-                print_progress_bar(n, num_frames, prefix='Progress:', suffix='Complete', length=50)
+                print_progress_bar(n, num_frames)
 
                 success, cv_image = video_capture.read()
 
@@ -122,7 +122,7 @@ def decompress(input_file, output_file='decompressed_video.mp4'):
 
         inputs = [inputs[k] for k in sorted(inputs) if k.startswith('channel:')]
 
-        print_progress_bar(0, num_frames, prefix='Progress:', suffix='Complete', length=50)
+        print_progress_bar(0, num_frames)
 
         with tf.Session() as sess:
             for n, key in enumerate(dictionary.keys()):
@@ -137,7 +137,7 @@ def decompress(input_file, output_file='decompressed_video.mp4'):
                     image = np.round(image)
 
                     frames.append(image.astype(np.uint8))
-                    print_progress_bar(n + 1, num_frames, prefix='Progress:', suffix='Complete', length=50)
+                    print_progress_bar(n + 1, num_frames)
 
     frame_shape = np.shape(image)
     width, height = frame_shape[1], frame_shape[0]
