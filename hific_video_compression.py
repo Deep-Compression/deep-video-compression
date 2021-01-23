@@ -111,7 +111,7 @@ def decompress(input_file, output_file='decompressed_video.mp4'):
         :param output_file: File name of decompressed video
     """
     dictionary = pickle.load(open(input_file, 'rb'))
-    num_frames = len(dictionary.keys())
+    num_frames = len(dictionary.keys()) - 2
 
     print("Starting decompression of file '" + input_file + "' (" + str(num_frames) + ' frames)...')
     frames = []
