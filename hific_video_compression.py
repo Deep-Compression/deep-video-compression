@@ -3,6 +3,8 @@
     to compress a video file, the video frames are separated and each frame will be compress using the hific model. All
     the compress frames are exported into a bitstring and written to file. This file represents the compressed video. To
     decompress a file, each frame is decompressed separately and the frames are fused into the final video file.
+
+    @author: Felix Beutter
 '''
 import os
 import sys
@@ -18,29 +20,31 @@ from compression.models.tfci import import_metagraph, instantiate_signature
 
 USAGE_MESSAGE = '''
 Usage:
-    python hific_video_compression.py <command> <file>
+    python hific_video_compression.py <command> <input_file> [output_file] [model]
     
 Commands:
     compress    Compresses a video file
     decompress  Decompresses a video file
+    
+Examples:
+    python hific_video_compression.py compress video.mp4 compressed_video.dvc hific-hi
+    python hific_video_compression.py decompress compressed_video.dvc decompressed_video.mp4
 '''
-
-MODEL = 'hific-lo'
 
 
 def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', end='\r'):
-    '''
-    Call in a loop to create terminal progress bar
-    @params:
-        iteration   - Required  : current iteration (Int)
-        total       - Required  : total iterations (Int)
-        prefix      - Optional  : prefix string (Str)
-        suffix      - Optional  : suffix string (Str)
-        decimals    - Optional  : positive number of decimals in percent complete (Int)
-        length      - Optional  : character length of bar (Int)
-        fill        - Optional  : bar fill character (Str)
-        printEnd    - Optional  : end character (e.g. '\r', '\r\n') (Str)
-    '''
+    """
+        Prints a progress bar to console.
+
+        :param iteration: Current iteration
+        :param total: Total iterations
+        :param prefix: Prefix string
+        :param suffix: Suffix string
+        :param decimals: Number of decimals in percent complete
+        :param length: Character length
+        :param fill: Bar fill character
+        :param end: End character (e.g. '\r', '\r\n')
+    """
     percent = ('{0:.' + str(decimals) + 'f}').format(100 * (iteration / float(total)))
     filled_length = int(length * iteration // total)
     bar = fill * filled_length + '-' * (length - filled_length)
@@ -51,12 +55,13 @@ def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, lengt
         print()
 
 
-def compress(input_file, output_file):
+def compress(input_file, output_file='compressed_video.dvc', model='hific-lo'):
     """
         Compresses a video file using the hific generative image compression.
 
         :param input_file: Video to compress
         :param output_file: File name of compressed video
+        :param model: hific model
     """
     video_capture = cv2.VideoCapture(input_file)
     num_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -65,10 +70,12 @@ def compress(input_file, output_file):
 
     success, cv_image = video_capture.read()
     n = 0
-    dictionary = {}
+
+    fps = video_capture.get(cv2.CAP_PROP_FPS)
+    dictionary = {'fps': fps, 'model': model}
 
     with tf.Graph().as_default():
-        signature_defs = import_metagraph(MODEL)
+        signature_defs = import_metagraph(model)
         inputs, outputs = instantiate_signature(signature_defs['sender'])
 
         inputs = inputs['input_image']
@@ -96,7 +103,7 @@ def compress(input_file, output_file):
     pickle.dump(dictionary, open(output_file, 'wb'))
 
 
-def decompress(input_file, output_file):
+def decompress(input_file, output_file='decompressed_video.mp4'):
     """
         Decompresses a compressed video file using the hific generative image compression.
 
@@ -110,7 +117,7 @@ def decompress(input_file, output_file):
     frames = []
 
     with tf.Graph().as_default():
-        signature_defs = import_metagraph(MODEL)
+        signature_defs = import_metagraph(dictionary['model'])
         inputs, outputs = instantiate_signature(signature_defs['receiver'])
 
         inputs = [inputs[k] for k in sorted(inputs) if k.startswith('channel:')]
@@ -119,22 +126,23 @@ def decompress(input_file, output_file):
 
         with tf.Session() as sess:
             for n, key in enumerate(dictionary.keys()):
-                bitstring = dictionary[key]
-                arrays = tfc.PackedTensors(bitstring).unpack(inputs)
+                if key not in ['fps', 'model']:
+                    bitstring = dictionary[key]
+                    arrays = tfc.PackedTensors(bitstring).unpack(inputs)
 
-                image = sess.run(outputs['output_image'], feed_dict=dict(zip(inputs, arrays)))
+                    image = sess.run(outputs['output_image'], feed_dict=dict(zip(inputs, arrays)))
 
-                image = np.asarray(image)
-                image = np.squeeze(image, 0)
-                image = np.round(image)
+                    image = np.asarray(image)
+                    image = np.squeeze(image, 0)
+                    image = np.round(image)
 
-                frames.append(image.astype(np.uint8))
-                print_progress_bar(n + 1, num_frames, prefix='Progress:', suffix='Complete', length=50)
+                    frames.append(image.astype(np.uint8))
+                    print_progress_bar(n + 1, num_frames, prefix='Progress:', suffix='Complete', length=50)
 
     frame_shape = np.shape(image)
     width, height = frame_shape[1], frame_shape[0]
 
-    video = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*'mp4v'), 30, (width, height))
+    video = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*'mp4v'), dictionary['fps'], (width, height))
 
     for frame in frames:
         video.write(frame)
@@ -145,7 +153,7 @@ def decompress(input_file, output_file):
 def main():
     error = False
 
-    if len(sys.argv) != 4:
+    if len(sys.argv) < 3:
         print('ERROR: syntax error')
         error = True
 
@@ -153,15 +161,30 @@ def main():
         print('ERROR: invalid command (' + sys.argv[1] + ')')
         error = True
 
+    else:
+        if sys.argv[1] == 'compress':
+            if len(sys.argv) not in range(3, 6):
+                print('ERROR: syntax error')
+                error = True
+
+            elif len(sys.argv) == 5:
+                if sys.argv[4] not in ['hific-lo', 'hific-mi', 'hific-hi']:
+                    print('ERROR: unknown model (' + sys.argv[4] + ')')
+
+        else:
+            if len(sys.argv) not in range(3, 5):
+                print('ERROR: syntax error')
+                error = True
+
     if error:
         print(USAGE_MESSAGE)
         exit(1)
 
     if sys.argv[1] == 'compress':
-        compress(sys.argv[2], sys.argv[3])
+        compress(*sys.argv[2:])
 
     else:
-        decompress(sys.argv[2], sys.argv[3])
+        decompress(*sys.argv[2:])
 
 
 if __name__ == '__main__':
