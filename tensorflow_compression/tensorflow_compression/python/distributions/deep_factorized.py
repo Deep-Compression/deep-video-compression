@@ -51,7 +51,7 @@ class DeepFactorized(tfp.distributions.Distribution):
   This is a flexible, nonparametric probability density model, described in
   appendix 6.1 of the paper:
 
-  > "Variational image compression with a scale hyperprior"<br />
+  > "Variational image tensorflow_compression with a scale hyperprior"<br />
   > J. Ballé, D. Minnen, S. Singh, S. J. Hwang, N. Johnston<br />
   > https://openreview.net/forum?id=rkcQFMZRb
 

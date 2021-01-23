@@ -76,7 +76,7 @@ class ContinuousEntropyModelBase(tf.Module, metaclass=abc.ABCMeta):
 
     Raises:
       RuntimeError: when attempting to instantiate an entropy model with
-        `compression=True` and not in eager execution mode.
+        `tensorflow_compression=True` and not in eager execution mode.
     """
     if prior.event_shape.rank:
       raise ValueError("`prior` must be a (batch of) scalar distribution(s).")
@@ -117,7 +117,7 @@ class ContinuousEntropyModelBase(tf.Module, metaclass=abc.ABCMeta):
     if not self.compression:
       raise RuntimeError(
           "For range coding, the entropy model must be instantiated with "
-          "`compression=True`.")
+          "`tensorflow_compression=True`.")
 
   @property
   def cdf(self):
@@ -171,7 +171,7 @@ class ContinuousEntropyModelBase(tf.Module, metaclass=abc.ABCMeta):
 
   @property
   def compression(self):
-    """Whether this entropy model is prepared for compression."""
+    """Whether this entropy model is prepared for tensorflow_compression."""
     return self._compression
 
   @property
@@ -223,7 +223,7 @@ class ContinuousEntropyModelBase(tf.Module, metaclass=abc.ABCMeta):
 
     The tables are stored in `tf.Variable`s as attributes of this object. The
     recommended way is to train the model, instantiate an entropy model with
-    `compression=True`, and then distribute the model to a sender and a
+    `tensorflow_compression=True`, and then distribute the model to a sender and a
     receiver.
 
     Arguments:
@@ -321,11 +321,11 @@ class ContinuousEntropyModelBase(tf.Module, metaclass=abc.ABCMeta):
 
     Raises:
       NotImplementedError: on attempting to call this method on an entropy model
-        with `compression=False`.
+        with `tensorflow_compression=False`.
     """
     if self.no_variables or not self.compression:
       raise NotImplementedError(
-          "Serializing entropy models with `compression=False` or "
+          "Serializing entropy models with `tensorflow_compression=False` or "
           "`no_variables=True` is currently not supported.")
     return dict(
         dtype=self._dtype.name,

@@ -57,13 +57,13 @@ releases](https://github.com/tensorflow/compression/releases).
 To install TF and TFC via `pip`, run the following command:
 
 ```bash
-pip install tensorflow-gpu==1.15 tensorflow-compression==1.3
+pip install tensorflow-gpu==1.15 tensorflow-tensorflow_compression==1.3
 ```
 
 for the stable release, or
 
 ```bash
-pip install tensorflow-gpu==2.4 tensorflow-probability==0.12.1 tensorflow-compression==2.0b2
+pip install tensorflow-gpu==2.4 tensorflow-probability==0.12.1 tensorflow-tensorflow_compression==2.0b2
 ```
 
 for the beta release. If you don't need GPU support, you can drop the `-gpu`
@@ -122,7 +122,7 @@ support:
 ```bash
 conda create --name ENV_NAME python=3.6 cudatoolkit=10.0 cudnn
 conda activate ENV_NAME
-pip install tensorflow-gpu==1.15 tensorflow-compression==1.3
+pip install tensorflow-gpu==1.15 tensorflow-tensorflow_compression==1.3
 ```
 
 ## Usage
@@ -268,7 +268,7 @@ popd
 When done, you can uninstall the pip package again:
 
 ```bash
-pip uninstall tensorflow-compression
+pip uninstall tensorflow-tensorflow_compression
 ```
 
 To build packages for Darwin (and potentially other platforms), you can follow

@@ -30,7 +30,7 @@ TFDSArguments = collections.namedtuple(
 
 class ModelType(enum.Enum):
   # Train hyperprior model: encoder/decoder/entropy model.
-  COMPRESSION = "compression"
+  COMPRESSION = "tensorflow_compression"
   # Additionally train a discriminator, and use GAN loss.
   COMPRESSION_GAN = "compression_gan"
 

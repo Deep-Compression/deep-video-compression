@@ -47,7 +47,7 @@ class ContinuousBatchedEntropyModel(continuous_base.ContinuousEntropyModelBase):
     compress the bottleneck tensor.
   - For evaluation, get a closer estimate of the number of compressed bits
     using training=False`.
-  - Instantiate an entropy model with `compression=True` (and the same
+  - Instantiate an entropy model with `tensorflow_compression=True` (and the same
     parameters as during training), and share the model between a sender and a
     receiver.
   - On the sender side, compute the bottleneck tensor and call `compress()` on
@@ -110,7 +110,7 @@ class ContinuousBatchedEntropyModel(continuous_base.ContinuousEntropyModelBase):
 
     Raises:
       RuntimeError: when attempting to instantiate an entropy model with
-        `compression=True` and not in eager execution mode.
+        `tensorflow_compression=True` and not in eager execution mode.
     """
     if coding_rank < prior.batch_shape.rank:
       raise ValueError(
@@ -326,7 +326,7 @@ class ContinuousBatchedEntropyModel(continuous_base.ContinuousEntropyModelBase):
 
     Raises:
       NotImplementedError: on attempting to call this method on an entropy model
-        with `compression=False`.
+        with `tensorflow_compression=False`.
     """
     config = super().get_config()
     config.update(

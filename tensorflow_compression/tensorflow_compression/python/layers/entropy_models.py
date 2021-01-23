@@ -54,8 +54,8 @@ class EntropyModel(tf.keras.layers.Layer):
         ensured to be greater than or equal to this value. This prevents very
         large gradients with a typical entropy loss (defaults to 1e-9).
       range_coder_precision: Integer, between 1 and 16. The precision of the
-        range coder used for compression and decompression. This trades off
-        computation speed with compression efficiency, where 16 is the slowest
+        range coder used for tensorflow_compression and decompression. This trades off
+        computation speed with tensorflow_compression efficiency, where 16 is the slowest
         but most efficient setting. Choosing lower values may increase the
         average codelength slightly compared to the estimated entropies.
       **kwargs: Other keyword arguments passed to superclass (`Layer`).
@@ -154,7 +154,7 @@ class EntropyModel(tf.keras.layers.Layer):
         densities. If `False`, returns the quantized inputs and their
         likelihoods under the corresponding probability mass function. These
         quantities can't be used for training, as they are not differentiable,
-        but represent actual compression more closely.
+        but represent actual tensorflow_compression more closely.
 
     Returns:
       values: `Tensor` with the same shape as `inputs` containing the perturbed
@@ -310,7 +310,7 @@ class EntropyBottleneck(EntropyModel):
   of its input tensor, which is described in the appendix of the paper (please
   cite the paper if you use this code for scientific work):
 
-  > "Variational image compression with a scale hyperprior"<br />
+  > "Variational image tensorflow_compression with a scale hyperprior"<br />
   > J. Ballé, D. Minnen, S. Singh, S. J. Hwang, N. Johnston<br />
   > https://arxiv.org/abs/1802.01436
 
@@ -320,7 +320,7 @@ class EntropyBottleneck(EntropyModel):
   assumes that across all other dimensions, the inputs are i.i.d. (independent
   and identically distributed).
 
-  Because data compression always involves discretization, the outputs of the
+  Because data tensorflow_compression always involves discretization, the outputs of the
   layer are generally only approximations of its inputs. During training,
   discretization is modeled using additive uniform noise to ensure
   differentiability. The entropies computed during training are differential
@@ -332,8 +332,8 @@ class EntropyBottleneck(EntropyModel):
   documentation to get started.
 
   Note: the layer always produces exactly one auxiliary loss and one update op,
-  which are only significant for compression and decompression. To use the
-  compression feature, the auxiliary loss must be minimized during or after
+  which are only significant for tensorflow_compression and decompression. To use the
+  tensorflow_compression feature, the auxiliary loss must be minimized during or after
   training. After that, the update op must be executed at least once.
   """
 
@@ -729,7 +729,7 @@ class SymmetricConditional(EntropyModel):
         `None`, the mean is assumed to be zero.
       indexes: `Tensor` of type `int32` or `None`. Can be used to override the
         selection of scale table indexes based on the predicted values in
-        `scale`. Only affects compression and decompression.
+        `scale`. Only affects tensorflow_compression and decompression.
       **kwargs: Other keyword arguments passed to superclass (`EntropyModel`).
     """
     super(SymmetricConditional, self).__init__(**kwargs)
@@ -961,7 +961,7 @@ class GaussianConditional(SymmetricConditional):
   estimate entropy of its input tensor, which is described in the paper (please
   cite the paper if you use this code for scientific work):
 
-  > "Variational image compression with a scale hyperprior"<br />
+  > "Variational image tensorflow_compression with a scale hyperprior"<br />
   > J. Ballé, D. Minnen, S. Singh, S. J. Hwang, N. Johnston<br />
   > https://arxiv.org/abs/1802.01436
   """

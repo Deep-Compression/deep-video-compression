@@ -39,7 +39,7 @@ class GDN(tf.keras.layers.Layer):
   > J. Ballé, V. Laparra, E.P. Simoncelli<br />
   > https://arxiv.org/abs/1511.06281
 
-  > "End-to-end optimized image compression"<br />
+  > "End-to-end optimized image tensorflow_compression"<br />
   > J. Ballé, V. Laparra, E.P. Simoncelli<br />
   > https://arxiv.org/abs/1611.01704
 

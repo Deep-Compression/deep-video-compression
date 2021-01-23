@@ -14,9 +14,9 @@
 # ==============================================================================
 """Nonlinear transform coder with hyperprior for RGB images.
 
-This is the image compression model published in:
+This is the image tensorflow_compression model published in:
 D. Minnen and S. Singh:
-"Channel-wise autoregressive entropy models for learned image compression"
+"Channel-wise autoregressive entropy models for learned image tensorflow_compression"
 Int. Conf. on Image Compression (ICIP), 2020
 https://arxiv.org/abs/2007.08739
 
@@ -25,7 +25,7 @@ own experiments. To reproduce the exact results from the paper, tuning of hyper-
 parameters may be necessary. To compress images with published models, see
 `tfci.py`.
 
-This script requires tensorflow-compression v2.x.
+This script requires tensorflow-tensorflow_compression v2.x.
 """
 
 import argparse
@@ -190,7 +190,7 @@ class SliceTransform(tf.keras.layers.Layer):
 
 
 class CompressionModel(tf.Module):
-  """Module that encapsulates the compression model."""
+  """Module that encapsulates the tensorflow_compression model."""
 
   def __init__(self, args):
     super().__init__()

@@ -55,9 +55,9 @@ def main(srcdir):
   atexit.register(os.chdir, os.getcwd())
   os.chdir(tempdir)
   setuptools.setup(
-      name='tensorflow-compression',
+      name='tensorflow-tensorflow_compression',
       version=__version__,
-      description='Data compression in TensorFlow',
+      description='Data tensorflow_compression in TensorFlow',
       url='https://tensorflow.github.io/compression/',
       author='Google LLC',
       # Contained modules and scripts.
@@ -95,7 +95,7 @@ def main(srcdir):
           'Tracker': 'https://github.com/tensorflow/compression/issues',
       },
       license='Apache 2.0',
-      keywords=('compression data-compression tensorflow machine-learning '
+      keywords=('tensorflow_compression data-tensorflow_compression tensorflow machine-learning '
                 'python deep-learning deep-neural-networks neural-network ml')
   )
 

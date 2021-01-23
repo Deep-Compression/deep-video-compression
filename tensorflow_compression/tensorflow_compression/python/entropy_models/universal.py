@@ -115,7 +115,7 @@ class UniversalBatchedEntropyModel(
 
     Raises:
       RuntimeError: when attempting to instantiate an entropy model with
-        `compression=True` and not in eager execution mode.
+        `tensorflow_compression=True` and not in eager execution mode.
     """
     # This attribute is used in methods we override in this class which
     # are used during used during super().__init__(...), so we set it first.
@@ -297,7 +297,7 @@ class UniversalIndexedEntropyModel(
 
     Raises:
       RuntimeError: when attempting to instantiate an entropy model with
-        `compression=True` and not in eager execution mode.
+        `tensorflow_compression=True` and not in eager execution mode.
     """
     if isinstance(index_ranges, int):
       raise ValueError(

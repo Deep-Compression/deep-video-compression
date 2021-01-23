@@ -14,7 +14,7 @@
 # ==============================================================================
 """Nonlinear transform coder with hyperprior for RGB images.
 
-This is the image compression model published in:
+This is the image tensorflow_compression model published in:
 J. Ballé, D. Minnen, S. Singh, S.J. Hwang, N. Johnston:
 "Variational Image Compression with a Scale Hyperprior"
 Int. Conf. on Learning Representations (ICLR), 2018
@@ -25,7 +25,7 @@ own experiments. To reproduce the exact results from the paper, tuning of hyper-
 parameters may be necessary. To compress images with published models, see
 `tfci.py`.
 
-Currently, this script requires tensorflow-compression v1.3.
+Currently, this script requires tensorflow-tensorflow_compression v1.3.
 """
 
 import argparse

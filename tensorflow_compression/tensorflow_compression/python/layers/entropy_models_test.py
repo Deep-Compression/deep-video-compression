@@ -151,7 +151,7 @@ class EntropyBottleneckTest(tf.test.TestCase):
     self.assertAllClose(values, decoded, rtol=0, atol=.5)
 
   def test_compress(self):
-    # Test compression and decompression, and produce test data for
+    # Test tensorflow_compression and decompression, and produce test data for
     # `test_decompress`. If you set the constant at the end to `True`, this test
     # will fail and the log will contain the new test data.
     inputs = tf.placeholder(tf.float32, (2, 3, 9))
@@ -378,7 +378,7 @@ class SymmetricConditionalTest(object):
     self.assertAllClose(values, decoded, rtol=0, atol=.5)
 
   def test_compress(self):
-    # Test compression and decompression, and produce test data for
+    # Test tensorflow_compression and decompression, and produce test data for
     # `test_decompress`. If you set the constant at the end to `True`, this test
     # will fail and the log will contain the new test data.
     shape = (2, 7)

@@ -89,7 +89,7 @@ def quantization_offset(distribution):
   """Computes distribution-dependent quantization offset.
 
   For range coding of continuous random variables, the values need to be
-  quantized first. Typically, it is beneficial for compression performance to
+  quantized first. Typically, it is beneficial for tensorflow_compression performance to
   align the centers of the quantization bins such that one of them coincides
   with the mode of the distribution. With `offset` being the mode of the
   distribution, for instance, this can be achieved simply by computing:

@@ -14,7 +14,7 @@
 # ==============================================================================
 """Basic nonlinear transform coder for RGB images.
 
-This is a close approximation of the image compression model published in:
+This is a close approximation of the image tensorflow_compression model published in:
 J. Ballé, V. Laparra, E.P. Simoncelli (2017):
 "End-to-end Optimized Image Compression"
 Int. Conf. on Learning Representations (ICLR), 2017
@@ -27,7 +27,7 @@ own experiments. To reproduce the exact results from the paper, tuning of hyper-
 parameters may be necessary. To compress images with published models, see
 `tfci.py`.
 
-Currently, this script requires tensorflow-compression v1.3.
+Currently, this script requires tensorflow-tensorflow_compression v1.3.
 """
 
 import argparse

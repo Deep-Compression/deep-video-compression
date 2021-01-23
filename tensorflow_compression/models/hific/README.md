@@ -38,7 +38,7 @@ Use `tfci.py` for locally running our models to encode and decode images:
 
 ```bash
 git clone https://github.com/tensorflow/compression
-cd compression/compression/models
+cd tensorflow_compression/tensorflow_compression/models
 python tfci.py compress <model> <PNG file>
 ```
 
@@ -63,7 +63,7 @@ conda create --name hific python=3.6 cudatoolkit=10.0 cudnn
 conda activate hific
 pip install tensorflow-gpu==1.15  # Make sure to install TF via pip, not conda!
 pip install git+git://github.com/google/compare_gan@19922d3004b675c1a49c4d7515c06f6f75acdcc8
-pip install tensorflow-compression==1.3
+pip install tensorflow-tensorflow_compression==1.3
 pip install Pillow
 ```
 

@@ -62,7 +62,7 @@ class UniformNoiseAdapter(tfp.distributions.Distribution):
   respectively, and `c` is the cumulative distribution function (CDF)
   corresponding to `p`. This is described in appendix 6.2 of the paper:
 
-  > "Variational image compression with a scale hyperprior"<br />
+  > "Variational image tensorflow_compression with a scale hyperprior"<br />
   > J. Ballé, D. Minnen, S. Singh, S. J. Hwang, N. Johnston<br />
   > https://openreview.net/forum?id=rkcQFMZRb
 

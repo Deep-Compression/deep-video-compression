@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""Generates docs for the TensorFlow compression library."""
+"""Generates docs for the TensorFlow tensorflow_compression library."""
 
 import os
 import sys
@@ -29,7 +29,7 @@ FLAGS = flags.FLAGS
 
 def main(_):
   doc_generator = generate_lib.DocGenerator(
-      root_title="TensorFlow/compression",
+      root_title="TensorFlow/tensorflow_compression",
       py_modules=[("tfc", tfc)],
       base_dir=os.path.dirname(tfc.__file__),
       private_map={

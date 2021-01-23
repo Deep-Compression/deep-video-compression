@@ -16,7 +16,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow.compat.v1 as tf
 import tensorflow_compression as tfc
 
-from compression.models.tfci import import_metagraph, instantiate_signature
+from tensorflow_compression.models.tfci import import_metagraph, instantiate_signature
 
 USAGE_MESSAGE = '''
 Usage:
@@ -57,7 +57,7 @@ def print_progress_bar(iteration, total, prefix='Progress:', suffix='Complete', 
 
 def compress(input_file, output_file='compressed_video.dvc', model='hific-lo'):
     """
-        Compresses a video file using the hific generative image compression.
+        Compresses a video file using the hific generative image tensorflow_compression.
 
         :param input_file: Video to compress
         :param output_file: File name of compressed video
@@ -66,7 +66,7 @@ def compress(input_file, output_file='compressed_video.dvc', model='hific-lo'):
     video_capture = cv2.VideoCapture(input_file)
     num_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    print("Starting compression of file '" + input_file + "' (" + str(num_frames) + ' frames)...')
+    print("Starting tensorflow_compression of file '" + input_file + "' (" + str(num_frames) + ' frames)...')
 
     success, cv_image = video_capture.read()
     n = 0
@@ -105,7 +105,7 @@ def compress(input_file, output_file='compressed_video.dvc', model='hific-lo'):
 
 def decompress(input_file, output_file='decompressed_video.mp4'):
     """
-        Decompresses a compressed video file using the hific generative image compression.
+        Decompresses a compressed video file using the hific generative image tensorflow_compression.
 
         :param input_file: Compressed video to decompress
         :param output_file: File name of decompressed video
