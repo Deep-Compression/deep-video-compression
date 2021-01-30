@@ -7,16 +7,17 @@
     @author: Felix Beutter
 '''
 import os
+import pickle
 import sys
+
 import cv2
 import numpy as np
-import pickle
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow.compat.v1 as tf
 import tensorflow_compression as tfc
 
-from tensorflow_compression.models.tfci import import_metagraph, instantiate_signature
+from compression.models.tfci import import_metagraph, instantiate_signature
 
 USAGE_MESSAGE = '''
 Usage:
@@ -32,7 +33,8 @@ Examples:
 '''
 
 
-def print_progress_bar(iteration, total, prefix='Progress:', suffix='Complete', decimals=2, length=50, fill='█', end='\r'):
+def print_progress_bar(iteration, total, prefix='Progress:', suffix='Complete', decimals=2, length=50, fill='█',
+                       end='\r'):
     """
         Prints a progress bar to console.
 
@@ -55,24 +57,34 @@ def print_progress_bar(iteration, total, prefix='Progress:', suffix='Complete', 
         print()
 
 
-def compress(input_file, output_file='compressed_video.dvc', model='hific-lo'):
+def compress(input_file, output_file='compressed_video.dvc', model='hific-lo', interpolation='linear',
+             num_intermediate_frames=2):
     """
-        Compresses a video file using the hific generative image tensorflow_compression.
+        Compresses a video file using the hific generative image compression.
 
         :param input_file: Video to compress
         :param output_file: File name of compressed video
         :param model: hific model
+        :param interpolation: Method to interpolate frames for further data reduction (None for no interpolation)
+        :param num_intermediate_frames: Number of frames to interpolate between to compressed ones
     """
     video_capture = cv2.VideoCapture(input_file)
     num_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    print("Starting tensorflow_compression of file '" + input_file + "' (" + str(num_frames) + ' frames)...')
+    if num_frames < 1:
+        print('ERROR: Video has no frames, compression will not be performed')
+        exit(0)
+
+    print("Starting compression of file '" + input_file + "' (" + str(num_frames) + ' frames)...')
 
     success, cv_image = video_capture.read()
     n = 0
 
     fps = video_capture.get(cv2.CAP_PROP_FPS)
-    dictionary = {'fps': fps, 'model': model}
+    num_end_frames = (num_frames - 1) % (num_intermediate_frames + 1) + 1
+
+    dictionary = {'fps': fps, 'model': model, 'num_frames': num_frames, 'interpolation': interpolation,
+                  'num_intermediate_frames': num_intermediate_frames, 'num_end_frames': num_end_frames}
 
     with tf.Graph().as_default():
         signature_defs = import_metagraph(model)
@@ -84,37 +96,43 @@ def compress(input_file, output_file='compressed_video.dvc', model='hific-lo'):
         print_progress_bar(0, num_frames)
 
         with tf.Session() as sess:
-            while success:
-                np_image = np.asarray(cv_image)
-                np_image = np.expand_dims(np_image, 0)
+            for _ in range(num_frames):
+                if interpolation is None or n % (num_intermediate_frames + 1) == 0 or n >= num_frames - num_end_frames:
+                    np_image = np.asarray(cv_image)
+                    np_image = np.expand_dims(np_image, 0)
 
-                arrays = sess.run(outputs, feed_dict={inputs: np_image})
+                    arrays = sess.run(outputs, feed_dict={inputs: np_image})
 
-                packed = tfc.PackedTensors()
-                packed.pack(outputs, arrays)
+                    packed = tfc.PackedTensors()
+                    packed.pack(outputs, arrays)
 
-                dictionary[str(n)] = packed.string
+                    dictionary[str(n)] = packed.string
 
                 n += 1
                 print_progress_bar(n, num_frames)
 
-                success, cv_image = video_capture.read()
+                _, cv_image = video_capture.read()
 
     pickle.dump(dictionary, open(output_file, 'wb'))
 
 
 def decompress(input_file, output_file='decompressed_video.mp4'):
     """
-        Decompresses a compressed video file using the hific generative image tensorflow_compression.
+        Decompresses a compressed video file using the hific generative image compression.
 
         :param input_file: Compressed video to decompress
         :param output_file: File name of decompressed video
     """
     dictionary = pickle.load(open(input_file, 'rb'))
-    num_frames = len(dictionary.keys()) - 2
+
+    num_frames = dictionary['num_frames']
+    num_intermediate_frames = dictionary['num_intermediate_frames']
+    num_end_frames = dictionary['num_end_frames']
+    interpolation = dictionary['interpolation']
 
     print("Starting decompression of file '" + input_file + "' (" + str(num_frames) + ' frames)...')
-    frames = []
+    frames = [None] * num_frames
+    n = 0
 
     with tf.Graph().as_default():
         signature_defs = import_metagraph(dictionary['model'])
@@ -122,12 +140,13 @@ def decompress(input_file, output_file='decompressed_video.mp4'):
 
         inputs = [inputs[k] for k in sorted(inputs) if k.startswith('channel:')]
 
-        print_progress_bar(0, num_frames)
+        progress = 0
+        print_progress_bar(progress, num_frames)
 
         with tf.Session() as sess:
-            for n, key in enumerate(dictionary.keys()):
-                if key not in ['fps', 'model']:
-                    bitstring = dictionary[key]
+            for _ in range(num_frames):
+                if interpolation is None or n % (num_intermediate_frames + 1) == 0 or n >= num_frames - num_end_frames:
+                    bitstring = dictionary[str(n)]
                     arrays = tfc.PackedTensors(bitstring).unpack(inputs)
 
                     image = sess.run(outputs['output_image'], feed_dict=dict(zip(inputs, arrays)))
@@ -136,8 +155,21 @@ def decompress(input_file, output_file='decompressed_video.mp4'):
                     image = np.squeeze(image, 0)
                     image = np.round(image)
 
-                    frames.append(image.astype(np.uint8))
-                    print_progress_bar(n + 1, num_frames)
+                    frames[n] = image.astype(np.uint8)
+
+                    progress += 1
+
+                n += 1
+                print_progress_bar(progress, num_frames)
+
+        if interpolation is not None:
+            for n in range(num_frames - num_end_frames):
+                if n % (num_intermediate_frames + 1) == 0:
+                    frames[n + 1:n + 1 + num_intermediate_frames] = linear_interpolation(frames[n], frames[
+                        n + 1 + num_intermediate_frames], num_intermediate_frames)
+
+                    progress += num_intermediate_frames
+                    print_progress_bar(progress, num_frames)
 
     frame_shape = np.shape(image)
     width, height = frame_shape[1], frame_shape[0]
@@ -148,6 +180,18 @@ def decompress(input_file, output_file='decompressed_video.mp4'):
         video.write(frame)
 
     video.release()
+
+
+def linear_interpolation(first_frame, last_frame, num_intermediate_frames):
+    """
+        Generates intermediate frames between a first and last frame using linear interpolation.
+
+        :param first_frame: First frame
+        :param last_frame: Last frame
+        :param num_intermediate_frames: Number of intermediate frames to be generated
+        :return: numpy array of generated intermediate frames
+    """
+    return np.linspace(first_frame, last_frame, num_intermediate_frames + 2, dtype=np.uint8)[1:-1]
 
 
 def main():
