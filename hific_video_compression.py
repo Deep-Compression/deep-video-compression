@@ -12,12 +12,15 @@ import sys
 
 import cv2
 import numpy as np
+import torch
+
+from sepconv_slomo.run import estimate
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow.compat.v1 as tf
 import tensorflow_compression as tfc
 
-from compression.models.tfci import import_metagraph, instantiate_signature
+from tf_compression.models.tfci import import_metagraph, instantiate_signature
 
 USAGE_MESSAGE = '''
 Usage:
@@ -58,7 +61,7 @@ def print_progress_bar(iteration, total, prefix='Progress:', suffix='Complete', 
 
 
 def compress(input_file, output_file='compressed_video.dvc', model='hific-lo', interpolation='linear',
-             num_intermediate_frames=2):
+             num_intermediate_frames=1):
     """
         Compresses a video file using the hific generative image compression.
 
@@ -165,8 +168,10 @@ def decompress(input_file, output_file='decompressed_video.mp4'):
         if interpolation is not None:
             for n in range(num_frames - num_end_frames):
                 if n % (num_intermediate_frames + 1) == 0:
-                    frames[n + 1:n + 1 + num_intermediate_frames] = linear_interpolation(frames[n], frames[
-                        n + 1 + num_intermediate_frames], num_intermediate_frames)
+                    # frames[n + 1:n + 1 + num_intermediate_frames] = linear_interpolation(frames[n], frames[
+                    #    n + 1 + num_intermediate_frames], num_intermediate_frames)
+
+                    frames[n + 1] = sepconv_slomo_interpolation(frames[n], frames[n + 2])
 
                     progress += num_intermediate_frames
                     print_progress_bar(progress, num_frames)
@@ -189,9 +194,28 @@ def linear_interpolation(first_frame, last_frame, num_intermediate_frames):
         :param first_frame: First frame
         :param last_frame: Last frame
         :param num_intermediate_frames: Number of intermediate frames to be generated
-        :return: numpy array of generated intermediate frames
+        :return: Numpy array of generated intermediate frames
     """
     return np.linspace(first_frame, last_frame, num_intermediate_frames + 2, dtype=np.uint8)[1:-1]
+
+
+def sepconv_slomo_interpolation(first_frame, second_frame):
+    """
+        Generates one intermediate frame between two frames using sepconv slomo.
+
+        :param first_frame: First frame
+        :param second_frame: Second frame
+        :return: Numpy array of generated intermediate frames
+    """
+    first_image_data = np.array(first_frame)[:, :, ::-1].transpose(2, 0, 1).astype(np.float32) * (1.0 / 255.0)
+    first_tensor = torch.FloatTensor(np.ascontiguousarray(first_image_data))
+
+    second_image_data = np.array(second_frame)[:, :, ::-1].transpose(2, 0, 1).astype(np.float32) * (1.0 / 255.0)
+    second_tensor = torch.FloatTensor(np.ascontiguousarray(second_image_data))
+
+    output = estimate(first_tensor, second_tensor)
+
+    return (output.clamp(0.0, 1.0).numpy().transpose(1, 2, 0)[:, :, ::-1] * 255.0).astype(np.uint8)
 
 
 def main():
