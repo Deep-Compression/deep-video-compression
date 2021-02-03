@@ -50,6 +50,7 @@ def compress_hific(frames, model='hific-lo'):
         :return: Packed tensors of the compressed images
     """
     packed_tensors = []
+    print_progress_bar(0, len(frames))
 
     with tf.Graph().as_default():
         if model not in ['hific-lo', 'hific-mi', 'hific-hi']:
@@ -62,7 +63,7 @@ def compress_hific(frames, model='hific-lo'):
         outputs = [outputs[k] for k in sorted(outputs) if k.startswith('channel:')]
 
         with tf.Session() as session:
-            for frame in frames:
+            for i, frame in enumerate(frames):
                 frame = np.expand_dims(frame, 0)
                 arrays = session.run(outputs, feed_dict={inputs: frame})
 
@@ -70,6 +71,8 @@ def compress_hific(frames, model='hific-lo'):
                 packed.pack(outputs, arrays)
 
                 packed_tensors.append(packed.string)
+
+                print_progress_bar(i + 1, len(frames))
 
     return packed_tensors
 
@@ -85,6 +88,9 @@ def decompress_hific(packed_tensors, model, process_dict=None):
     """
     frames = []
 
+    print('Decompressing packed tensors using hific')
+    print_progress_bar(0, len(packed_tensors))
+
     with tf.Graph().as_default():
         signature_defs = import_metagraph(model)
         inputs, outputs = instantiate_signature(signature_defs['receiver'])
@@ -92,11 +98,13 @@ def decompress_hific(packed_tensors, model, process_dict=None):
         inputs = [inputs[k] for k in sorted(inputs) if k.startswith('channel:')]
 
         with tf.Session() as session:
-            for packed_tensor in packed_tensors:
+            for i, packed_tensor in enumerate(packed_tensors):
                 arrays = tfc.PackedTensors(packed_tensor).unpack(inputs)
                 frame = session.run(outputs['output_image'], feed_dict=dict(zip(inputs, arrays)))
 
                 frames.append(np.round(np.squeeze(np.asarray(frame), 0)).astype(np.uint8))
+
+                print_progress_bar(i + 1, len(packed_tensors))
 
     if process_dict is not None:
         process_dict['result'] = frames
@@ -172,11 +180,14 @@ def compress(input_file, output_file='compressed_video.dvc', model='hific-lo', i
         :param num_intermediate_frames: Number of frames to interpolate between to compressed ones
     """
     video_capture = cv2.VideoCapture(input_file)
-    num_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    # num_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    num_frames = 1000
 
     if num_frames < 1:
         print('ERROR: Video has no frames, compression will not be performed')
         exit(0)
+
+    print("Starting compression of file '" + input_file + "' (" + str(num_frames) + ' frames)...')
 
     fps = video_capture.get(cv2.CAP_PROP_FPS)
     num_end_frames = (num_frames - 1) % (num_intermediate_frames + 1) + 1
@@ -208,6 +219,7 @@ def decompress(input_file, output_file='decompressed_video.mp4'):
         :param output_file: File name of decompressed video
     """
     dictionary = pickle.load(open(input_file, 'rb'))
+    print("Starting decompression of file '" + input_file + "' (" + str(dictionary['num_frames']) + ' frames)...')
 
     num_end_frames = dictionary['num_end_frames']
     interpolation = dictionary['interpolation']
@@ -231,6 +243,9 @@ def decompress(input_file, output_file='decompressed_video.mp4'):
     else:
         frames = []
 
+        print('Interpolating intermediate frames')
+        print_progress_bar(0, len(decompressed_frames) - num_end_frames)
+
         for n in range(len(decompressed_frames) - num_end_frames):
             frames.append(decompressed_frames[n])
 
@@ -238,10 +253,11 @@ def decompress(input_file, output_file='decompressed_video.mp4'):
                 recursion_depth = int(math.log(num_intermediate_frames + 1, 2))
                 frames.extend(recursive_sepconv_slomo_interpolation(decompressed_frames[n], decompressed_frames[n + 1],
                                                                     recursion_depth))
-
             else:
                 frames.extend(
                     linear_interpolation(decompressed_frames[n], decompressed_frames[n + 1], num_intermediate_frames))
+
+            print_progress_bar(n + 1, len(decompressed_frames) - num_end_frames)
 
         frames.extend(decompressed_frames[-num_end_frames:])
 
@@ -265,8 +281,8 @@ def main():
         decompress(*sys.argv[2:])
     '''
 
-    # compress('video.mp4', interpolation='sepconv_slomo', num_intermediate_frames=1)
-    decompress('compressed_video.dvc')
+    compress('video_raw.y4m', interpolation='sepconv_slomo', num_intermediate_frames=1)
+    # decompress('compressed_video.dvc')
 
 
 if __name__ == '__main__':
