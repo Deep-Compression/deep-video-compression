@@ -102,7 +102,12 @@ def decompress_hific(packed_tensors, model, process_dict=None):
                 arrays = tfc.PackedTensors(packed_tensor).unpack(inputs)
                 frame = session.run(outputs['output_image'], feed_dict=dict(zip(inputs, arrays)))
 
-                frames.append(np.round(np.squeeze(np.asarray(frame), 0)).astype(np.uint8))
+                frame = np.squeeze(frame, 0)
+                frame = np.round(frame)
+                frame = np.clip(frame, 0, 255)
+                frame = frame.astype(np.uint8)
+
+                frames.append(frame)
 
                 print_progress_bar(i + 1, len(packed_tensors))
 
@@ -180,8 +185,8 @@ def compress(input_file, output_file='compressed_video.dvc', model='hific-lo', i
         :param num_intermediate_frames: Number of frames to interpolate between to compressed ones
     """
     video_capture = cv2.VideoCapture(input_file)
-    # num_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
-    num_frames = 1000
+    num_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    # num_frames = 1000
 
     if num_frames < 1:
         print('ERROR: Video has no frames, compression will not be performed')
@@ -281,8 +286,9 @@ def main():
         decompress(*sys.argv[2:])
     '''
 
-    compress('video_raw.y4m', interpolation='sepconv_slomo', num_intermediate_frames=1)
-    # decompress('compressed_video.dvc')
+    # compress('video_raw.y4m', interpolation='sepconv_slomo', num_intermediate_frames=3)
+    # compress('image.mp4')
+    decompress('compressed_video.dvc')
 
 
 if __name__ == '__main__':
