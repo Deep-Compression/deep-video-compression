@@ -286,9 +286,9 @@ def main():
         decompress(*sys.argv[2:])
     '''
 
-    # compress('video_raw.y4m', interpolation='sepconv_slomo', num_intermediate_frames=3)
-    # compress('image.mp4')
-    decompress('compressed_video.dvc')
+    # compress('video_raw.y4m', interpolation='sepconv_slomo', num_intermediate_frames=1, model='hific-hi')
+    compress('video_raw.y4m', model='hific-hi')
+    # decompress('compressed_video.dvc')
 
 
 if __name__ == '__main__':
