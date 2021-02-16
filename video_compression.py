@@ -9,6 +9,7 @@ import numpy as np
 import torch
 
 from sepconv_slomo.run import estimate
+from RIFE.run import inference
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow.compat.v1 as tf
@@ -258,6 +259,9 @@ def decompress(input_file, output_file='decompressed_video.mp4'):
                 recursion_depth = int(math.log(num_intermediate_frames + 1, 2))
                 frames.extend(recursive_sepconv_slomo_interpolation(decompressed_frames[n], decompressed_frames[n + 1],
                                                                     recursion_depth))
+            elif interpolation == 'rife':
+                recursion_depth = int(math.log(num_intermediate_frames + 1, 2))
+                frames.extend(inference(decompressed_frames[n], decompressed_frames[n + 1], recursion_depth))
             else:
                 frames.extend(
                     linear_interpolation(decompressed_frames[n], decompressed_frames[n + 1], num_intermediate_frames))
