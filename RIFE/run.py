@@ -4,7 +4,7 @@ import torch
 import argparse
 import numpy as np
 from torch.nn import functional as F
-from model.RIFE_HDv2 import Model
+from .model.RIFE_HDv2 import Model
 import warnings
 
 def inference(image0, image1, exp):
@@ -21,10 +21,10 @@ def inference(image0, image1, exp):
     model.eval()
     model.device()
 
-    img0 = np.asmatrix(image0)
-    img1 = np.asmatrix(image1)
-    img0 = (torch.tensor(img0.transpose(2, 0, 1)).to(device) / 255.).unsqueeze(0)
-    img1 = (torch.tensor(img1.transpose(2, 0, 1)).to(device) / 255.).unsqueeze(0)
+    #img0 = np.asmatrix(image0)
+    #img1 = np.asmatrix(image1)
+    img0 = (torch.tensor(image0.transpose(2, 0, 1)).to(device) / 255.).unsqueeze(0)
+    img1 = (torch.tensor(image1.transpose(2, 0, 1)).to(device) / 255.).unsqueeze(0)
 
     n, c, h, w = img0.shape
     ph = ((h - 1) // 32 + 1) * 32
@@ -45,6 +45,6 @@ def inference(image0, image1, exp):
 
     out = []
     for i in range(len(img_list)):
-        out.append((img_list[i][0] * 255).byte().cpu().np.transpose(1, 2, 0)[:h, :w])
+        out.append((img_list[i][0] * 255).byte().cpu().numpy().transpose(1, 2, 0)[:h, :w])
     
-    return out
+    return out[1:-1]

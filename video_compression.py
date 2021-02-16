@@ -187,7 +187,7 @@ def compress(input_file, output_file='compressed_video.dvc', model='hific-lo', i
     """
     video_capture = cv2.VideoCapture(input_file)
     num_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
-    # num_frames = 1000
+    # num_frames = 200
 
     if num_frames < 1:
         print('ERROR: Video has no frames, compression will not be performed')
@@ -290,9 +290,8 @@ def main():
         decompress(*sys.argv[2:])
     '''
 
-    # compress('video_raw.y4m', interpolation='sepconv_slomo', num_intermediate_frames=1, model='hific-hi')
-    compress('video_raw.y4m', model='hific-hi')
-    # decompress('compressed_video.dvc')
+    # compress('video_raw.y4m', interpolation='linear', num_intermediate_frames=7, model='hific-lo')
+    decompress('compressed_video.dvc')
 
 
 if __name__ == '__main__':

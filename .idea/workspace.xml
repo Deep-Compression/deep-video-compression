@@ -3,6 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="bdf5ab1f-8fa3-43a2-921c-a21a091e8c0b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RIFE/model/IFNet_HDv2.py" beforeDir="false" afterPath="$PROJECT_DIR$/RIFE/model/IFNet_HDv2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RIFE/model/RIFE_HDv2.py" beforeDir="false" afterPath="$PROJECT_DIR$/RIFE/model/RIFE_HDv2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RIFE/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/RIFE/run.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/video_compression.py" beforeDir="false" afterPath="$PROJECT_DIR$/video_compression.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -18,6 +21,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="develop" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitSEFilterConfiguration">
