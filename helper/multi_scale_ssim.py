@@ -1,5 +1,4 @@
 import numpy as np
-from PIL.Image import Image
 from scipy import signal
 from scipy.ndimage.filters import convolve
 
