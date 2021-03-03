@@ -242,7 +242,7 @@ def evaluate(properties):
         results = np.insert(results, 0, properties.interpolation_depths, axis=0)
         results = np.insert(results, 0, properties.models, axis=1)
 
-        print('\n\nEvaluation complete! Results (mean MS-SSIM):')
+        print('\nEvaluation complete! Results (mean MS-SSIM):')
         table = AsciiTable(results.tolist())
         print(table.table + '\n')
 
