@@ -29,8 +29,8 @@ class ExperimentProperties:
         Contains the properties for a test/evaluation experiment.
     """
 
-    def __init__(self, dataset_dir='dataset', output_dir='output', models=['hific-lo', 'hific-hi'],
-                 interpolation_methods=['linear', 'sepconv_slomo'], interpolation_depths=[1, 2, 3]):
+    def __init__(self, dataset_dir='dataset', output_dir='output', models=['hific-hi'],
+                 interpolation_methods=['linear', 'sepconv_slomo'], interpolation_depths=[1, 3]):
         """
             :param dataset_dir: Dataset directory
             :param output_dir: Output directory
@@ -97,7 +97,7 @@ def compress_dataset(properties):
     compression_results = np.insert(compression_results, 0, properties.interpolation_depths, axis=0)
     compression_results = np.insert(compression_results, 0, properties.models, axis=1)
 
-    print('\n\nCompression complete! Results (compression factors/file size ratio):')
+    print('\nCompression complete! Results (compression factors/file size ratio):')
     table = AsciiTable(compression_results.tolist())
     print(table.table + '\n')
 
@@ -146,7 +146,7 @@ def decompress_dataset(properties):
     print('Decompression complete!\n')
 
 
-def interpolate_frames_and_evaluate(properties):
+def interpolate_frames(properties):
     """
         Interpolates intermediate frames between decompressed key frames and writes generated videos to file.
 
@@ -158,7 +158,6 @@ def interpolate_frames_and_evaluate(properties):
 
     for method in properties.interpolation_methods:
         print('Interpolating frames using {} interpolation and evaluating the results...'.format(method))
-        results = np.zeros((len_models, len_interpolation_depths, len_dataset_files))
 
         n = 0
         print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
@@ -172,11 +171,11 @@ def interpolate_frames_and_evaluate(properties):
         else:
             raise RuntimeError('Invalid interpolation method (\'{}\').'.format(method))
 
-        for i, model in enumerate(properties.models):
-            for j, depth in enumerate(properties.interpolation_depths):
+        for model in properties.models:
+            for depth in properties.interpolation_depths:
                 key_frames_dir = properties.output_dir + '/decompressed/key_frames/{}/depth_{}'.format(model, depth)
 
-                for k, file in enumerate(properties.dataset_files):
+                for file in properties.dataset_files:
                     key_frames_file = key_frames_dir + '/' + os.path.splitext(file)[0] + '.keyframes'
                     key_frames_dict = pickle.load(open(key_frames_file, 'rb'))
 
@@ -189,12 +188,50 @@ def interpolate_frames_and_evaluate(properties):
                         print_progress=False
                     ))
 
+                    output_file = properties.output_dir + '/decompressed/frames/{}/{}/depth_{}/' \
+                        .format(method, model, depth) + os.path.splitext(file)[0] + '.frames'
+                    Path('/'.join(output_file.split('/')[0:-1])).mkdir(parents=True, exist_ok=True)
+
+                    pickle.dump({'frames': frames}, open(output_file, 'wb'))
+
                     output_file = properties.output_dir + '/decompressed/videos/{}/{}/depth_{}/' \
                         .format(method, model, depth) + os.path.splitext(file)[0] + '.mp4'
                     write_frames_to_video(output_file, frames, key_frames_dict['fps'], print_log_messages=False)
 
+                    n += 1
+                    print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
+
+        print('Interpolation of intermediate frames using {} interpolation complete!\n'.format(method))
+
+
+def evaluate(properties):
+    """
+        Evaluates the decompressed videos using MS-SSIM.
+
+        :param properties: Experiment properties
+    """
+    len_models, len_interpolation_depths, len_dataset_files = len(properties.models), len(
+        properties.interpolation_depths), len(properties.dataset_files)
+    process_steps = len_models * len_interpolation_depths * len_dataset_files
+
+    for method in properties.interpolation_methods:
+        print('Evaluating decompressed keyframes and interpolated intermediate frames ({} interpolation)...'.format(
+            method))
+        results = np.zeros((len_models, len_interpolation_depths, len_dataset_files))
+
+        n = 0
+        print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
+
+        for i, model in enumerate(properties.models):
+            for j, depth in enumerate(properties.interpolation_depths):
+                frames_dir = properties.output_dir + '/decompressed/frames/{}/{}/depth_{}'.format(method, model, depth)
+
+                for k, file in enumerate(properties.dataset_files):
+                    frames_file = frames_dir + '/' + os.path.splitext(file)[0] + '.frames'
+                    frames_dict = pickle.load(open(frames_file, 'rb'))
+
                     original_frames = np.array(video_to_frames(properties.dataset_dir + '/' + file))
-                    results[i][j][k] = multi_scale_ssim(original_frames, frames)
+                    results[i][j][k] = multi_scale_ssim(original_frames, frames_dict['frames'])
 
                     n += 1
                     print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
@@ -205,7 +242,7 @@ def interpolate_frames_and_evaluate(properties):
         results = np.insert(results, 0, properties.interpolation_depths, axis=0)
         results = np.insert(results, 0, properties.models, axis=1)
 
-        print('\n\nInterpolation complete! Results (mean MS-SSIM):')
+        print('\n\nEvaluation complete! Results (mean MS-SSIM):')
         table = AsciiTable(results.tolist())
         print(table.table + '\n')
 
@@ -217,7 +254,8 @@ def main():
 
     compress_dataset(properties)
     decompress_dataset(properties)
-    interpolate_frames_and_evaluate(properties)
+    interpolate_frames(properties)
+    evaluate(properties)
 
 
 if __name__ == '__main__':
