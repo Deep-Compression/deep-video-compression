@@ -9,7 +9,7 @@ def calculate_lpips(img0, img1):
     img0 = torch.from_numpy(img0)
     img1 = torch.from_numpy(img1)
 
-    # normalize images to [-1, 1] !!!
+    # normalize images to [-1, 1]
     img0 = img0 / 127.5 - 1
     img1 = img1 / 127.5 - 1
     
