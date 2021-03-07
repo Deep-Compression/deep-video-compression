@@ -20,6 +20,8 @@ from image_compression.hific_decompression import decompress_process
 
 from deep_video_compression.compress_video import compress_video
 from metrics.multi_scale_ssim import multi_scale_ssim
+from metrics.psnr import calculate_psnr
+from metrics.PerceptualSimilarity.lpips import calculate_lpips
 from helper.video_to_frames import video_to_frames
 from helper.print_progress_bar import print_progress_bar
 
@@ -232,6 +234,8 @@ def evaluate(properties):
 
                     original_frames = np.array(video_to_frames(properties.dataset_dir + '/' + file))
                     results[i][j][k] = multi_scale_ssim(original_frames, frames_dict['frames'])
+                    #results[i][j][k] = calculate_psnr(img0, img1)
+                    #results[i][j][k] = calculate_lpips(img0, img1)
 
                     n += 1
                     print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
