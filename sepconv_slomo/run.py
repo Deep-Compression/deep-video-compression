@@ -15,7 +15,7 @@ import tempfile
 import time
 
 try:
-	from .sepconv import sepconv # the custom separable convolution layer
+	from sepconv_slomo import sepconv # the custom separable convolution layer
 except:
 	sys.path.insert(0, './sepconv'); import sepconv # you should consider upgrading python
 # end

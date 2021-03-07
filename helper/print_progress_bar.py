@@ -1,4 +1,11 @@
-def print_progress_bar(iteration, total, prefix='Progress:', suffix='Complete', decimals=2, length=50, fill='█',
+"""
+    Created on 18 Feb 2021 09:09am
+
+    @author Felix Beutter
+"""
+
+
+def print_progress_bar(iteration, total, prefix='Progress:', suffix='', decimals=2, length=50, fill='█',
                        end='\r'):
     """
         Prints a progress bar to console.
