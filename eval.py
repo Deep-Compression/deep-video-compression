@@ -14,14 +14,14 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # disable tensorflow debug output
 
 from frame_interpolation.interpolation import interpolate_frames_process
 from frame_interpolation.linear import linear_interpolation
-from frame_interpolation.sepconv_slomo import sepconv_slomo_interpolation
+#from frame_interpolation.sepconv_slomo import sepconv_slomo_interpolation
 from helper.video_writer import write_frames_to_video
 from image_compression.hific_decompression import decompress_process
 
 from deep_video_compression.compress_video import compress_video
 from metrics.multi_scale_ssim import multi_scale_ssim
 from metrics.psnr import calculate_psnr
-from metrics.PerceptualSimilarity.lpips import calculate_lpips
+#from metrics.PerceptualSimilarity.lpips import calculate_lpips
 from helper.video_to_frames import video_to_frames
 from helper.print_progress_bar import print_progress_bar
 
@@ -32,7 +32,8 @@ class ExperimentProperties:
     """
 
     def __init__(self, dataset_dir='dataset', output_dir='output', models=['hific-hi'],
-                 interpolation_methods=['linear', 'sepconv_slomo'], interpolation_depths=[1, 3]):
+                 interpolation_methods=['linear'], interpolation_depths=[1, 3],
+                 evaluation_metrics=['msssim', 'psnr']):
         """
             :param dataset_dir: Dataset directory
             :param output_dir: Output directory
@@ -45,6 +46,7 @@ class ExperimentProperties:
         self.models = models
         self.interpolation_methods = interpolation_methods
         self.interpolation_depths = interpolation_depths
+        self.evaluation_metrics = evaluation_metrics
 
         if not os.path.isdir(dataset_dir):
             raise RuntimeError('Dataset directory does not exist!')
@@ -219,7 +221,9 @@ def evaluate(properties):
     for method in properties.interpolation_methods:
         print('Evaluating decompressed keyframes and interpolated intermediate frames ({} interpolation)...'.format(
             method))
-        results = np.zeros((len_models, len_interpolation_depths, len_dataset_files))
+        results_msssim = np.zeros((len_models, len_interpolation_depths, len_dataset_files))
+        results_psnr = np.zeros((len_models, len_interpolation_depths, len_dataset_files))
+        results_lpips = np.zeros((len_models, len_interpolation_depths, len_dataset_files))
 
         n = 0
         print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
@@ -233,21 +237,47 @@ def evaluate(properties):
                     frames_dict = pickle.load(open(frames_file, 'rb'))
 
                     original_frames = np.array(video_to_frames(properties.dataset_dir + '/' + file))
-                    results[i][j][k] = multi_scale_ssim(original_frames, frames_dict['frames'])
-                    #results[i][j][k] = calculate_psnr(img0, img1)
-                    #results[i][j][k] = calculate_lpips(img0, img1)
+                    
+                    # ToDo: to be made to write into only one 'results' list and reduce redundancy concerning the results operations
+                    for l, metric in enumerate(properties.evaluation_metrics):
+                        if metric == 'msssim':
+                            results_msssim[i][j][k] = multi_scale_ssim(original_frames, frames_dict['frames'])
+                        
+                        elif metric == 'psnr':
+                            for m, original_frame in enumerate(original_frames):
+                                results_psnr[i][j][k][m] = calculate_psnr(original_frame, frames_dict['frames'][m])
+                        
+                        elif metric == 'lpips':
+                            for m, original_frame in enumerate(original_frames):
+                                results_lpips[i][j][k][m] = calculate_lpips(original_frame, frames_dict['frames'][m])
 
                     n += 1
                     print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
 
-        results = np.mean(results, axis=-1).astype('str')
+        results_msssim = np.mean(results_msssim, axis=-1).astype('str')
+        results_psnr = np.mean(results_psnr, axis=-1).astype('str')
+        results_lpips = np.mean(results_lpips, axis=-1).astype('str')
 
         properties.models.insert(0, '')
-        results = np.insert(results, 0, properties.interpolation_depths, axis=0)
-        results = np.insert(results, 0, properties.models, axis=1)
+        results_msssim = np.insert(results_msssim, 0, properties.interpolation_depths, axis=0)
+        results_msssim = np.insert(results_msssim, 0, properties.models, axis=1)
+        
+        results_psnr = np.insert(results_psnr, 0, properties.interpolation_depths, axis=0)
+        results_psnr = np.insert(results_psnr, 0, properties.models, axis=1)
+
+        results_lpips = np.insert(results_lpips, 0, properties.interpolation_depths, axis=0)
+        results_lpips = np.insert(results_lpips, 0, properties.models, axis=1)
 
         print('\nEvaluation complete! Results (mean MS-SSIM):')
-        table = AsciiTable(results.tolist())
+        table = AsciiTable(results_msssim.tolist())
+        print(table.table + '\n')
+
+        print('\nEvaluation complete! Results (mean PSNR):')
+        table = AsciiTable(results_psnr.tolist())
+        print(table.table + '\n')
+
+        print('\nEvaluation complete! Results (mean LPIPS):')
+        table = AsciiTable(results_lpips.tolist())
         print(table.table + '\n')
 
         properties.models.pop(0)
