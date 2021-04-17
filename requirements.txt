@@ -1,4 +1,5 @@
-
+# Python version should be 3.8
+# Basics
 scipy>=1
 tensorflow>=2.4.0
 tensorflow_probability>=0.12.1
@@ -15,5 +16,5 @@ matplotlib>=1.5.1
 tqdm>=4.28.1
 jupyter>=1.0.0
 # GPU stuff that is needed for some functionality:
-#tensorflow-gpu==2.4
-#cupy>=8.5.0
+tensorflow-gpu==2.4
+cupy>=8.5.0
