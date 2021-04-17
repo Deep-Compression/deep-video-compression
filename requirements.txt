@@ -2,7 +2,6 @@
 # Basics
 scipy>=1
 tensorflow>=2.4.0
-tensorflow_probability>=0.12.1
 tensorflow-probability==0.12.1
 tensorflow-compression==2.0b2
 torch>=1.8.0
