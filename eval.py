@@ -18,7 +18,7 @@ from frame_interpolation.linear import linear_interpolation
 from helper.video_writer import write_frames_to_video
 from image_compression.hific_decompression import decompress_process
 
-from deep_video_compression.compress_video import compress_video
+from deep_video_compression.compress_video import compress_sequence
 from metrics.multi_scale_ssim import multi_scale_ssim
 from metrics.psnr import calculate_psnr
 #from metrics.PerceptualSimilarity.lpips import calculate_lpips
@@ -31,9 +31,9 @@ class ExperimentProperties:
         Contains the properties for a test/evaluation experiment.
     """
 
-    def __init__(self, dataset_dir='dataset', output_dir='output', models=['hific-hi'],
-                 interpolation_methods=['linear'], interpolation_depths=[1, 3],
-                 evaluation_metrics=['msssim', 'psnr']):
+    def __init__(self, dataset_dir='./dataset', output_dir='output', models=['hific-hi'],
+                 interpolation_methods=['linear'], interpolation_depths=[1],
+                 evaluation_metrics=['msssim']):
         """
             :param dataset_dir: Dataset directory
             :param output_dir: Output directory
@@ -51,8 +51,6 @@ class ExperimentProperties:
         if not os.path.isdir(dataset_dir):
             raise RuntimeError('Dataset directory does not exist!')
 
-        self.dataset_files = os.listdir(dataset_dir)
-
 
 def compress_dataset(properties):
     """
@@ -62,8 +60,7 @@ def compress_dataset(properties):
     """
     print('Compression of dataset files...')
 
-    len_models, len_interpolation_depths, len_dataset_files = len(properties.models), len(
-        properties.interpolation_depths), len(properties.dataset_files)
+    len_models, len_interpolation_depths = len(properties.models), len(properties.interpolation_depths)
 
     compression_results = np.zeros((len_models, len_interpolation_depths, len_dataset_files))
     process_steps = len_models * len_interpolation_depths * len_dataset_files
@@ -73,27 +70,32 @@ def compress_dataset(properties):
 
     for i, model in enumerate(properties.models):
         for j, depth in enumerate(properties.interpolation_depths):
-            for k, file in enumerate(properties.dataset_files):
-                input_file = properties.dataset_dir + '/' + file
+            for root, dirs, files in os.walk(properties.dataset_dir):
+                if 'img1.png' in files:
+                    input_dir = root
 
-                output_path = properties.output_dir + '/compressed/{}/depth_{}/'.format(model, depth)
-                output_file = output_path + os.path.splitext(file)[0] + '.dvc'
+                    output_path = properties.output_dir + '/compressed/{}/depth_{}/'.format(model, depth)
+                    output_file = output_path + root.replace('/', '') + '.dvc'
 
-                compress_video(
-                    input_file=input_file,
-                    output_file=output_file,
-                    model=model,
-                    interpolation_depth=depth,
-                    print_log_messages=False,
-                    print_progress=False
-                )
+                    compress_sequence(
+                        input_path=input_dir,
+                        output_file=output_file,
+                        model=model,
+                        interpolation_depth=depth,
+                        print_log_messages=False,
+                        print_progress=False
+                    )
 
-                original_file_size = os.path.getsize(input_file)
-                compressed_file_size = os.path.getsize(output_file)
-                compression_results[i][j][k] = compressed_file_size / original_file_size
+                    original_file_size = 0
+                    for file in files:
+                        if len(os.path.basename(image)) == 7:
+                            original_file_size += os.path.getsize(file)
 
-                n += 1
-                print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
+                    compressed_file_size = os.path.getsize(output_file)
+                    compression_results[i][j][k] = compressed_file_size / original_file_size
+
+                    n += 1
+                    print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
 
     compression_results = np.mean(compression_results * 100, axis=-1).astype('str')
 
