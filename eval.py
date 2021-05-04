@@ -70,7 +70,7 @@ def compress_dataset(properties):
 
     print('...with HiFiC models: '.join(properties.models))
     print('...with interpolation methods: '.join(properties.interpolation_methods))
-    print('...with interpolation depths: '.join(properties.interpolation_depths))
+    print('...with interpolation depths: '.join(map(str, properties.interpolation_depths)))
     print('...number sequences in dataset:' + str(len_dataset_files))
     
     compression_results = np.zeros((len_models, len_interpolation_depths, len_dataset_files))
