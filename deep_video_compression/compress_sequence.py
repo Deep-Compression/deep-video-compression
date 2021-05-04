@@ -25,8 +25,8 @@ def compress_sequence(input_path, output_file='compressed_video.dvc', model='hif
     file_list = os.listdir(input_path)
     print(file_list)
     for image in file_list:
-        if len(os.path.basename(image)) == 7:
-            sequence.append(cv2.imread(image))
+        if len(image) == 7:
+            sequence.append(cv2.imread(input_path + image))
 
     print(sequence)
 
