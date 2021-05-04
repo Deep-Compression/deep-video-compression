@@ -65,6 +65,11 @@ def compress_dataset(properties):
     # count sequences
     len_dataset_files = 0
     for root, dirs, files in os.walk(properties.dataset_dir):
+        print()
+        print(root)
+        print(dirs)
+        print(files)
+        print()
         if 'img1.png' in files:
             len_dataset_files += 1
 
