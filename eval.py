@@ -70,7 +70,7 @@ def compress_dataset(properties):
         print(dirs)
         print(files)
         print()
-        if 'img1.png' in files:
+        if 'im1.png' in files:
             len_dataset_files += 1
 
     print('...with HiFiC models:           ' + ''.join(properties.models))
@@ -87,7 +87,7 @@ def compress_dataset(properties):
     for i, model in enumerate(properties.models):
         for j, depth in enumerate(properties.interpolation_depths):
             for root, dirs, files in os.walk(properties.dataset_dir):
-                if 'img1.png' in files:
+                if 'im1.png' in files:
                     input_dir = root
 
                     output_path = properties.output_dir + '/compressed/{}/depth_{}/'.format(model, depth)
