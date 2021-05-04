@@ -81,6 +81,7 @@ def compress_dataset(properties):
 
     for i, model in enumerate(properties.models):
         for j, depth in enumerate(properties.interpolation_depths):
+            k = 0
             for root, dirs, files in os.walk(properties.dataset_dir):
                 if 'im1.png' in files:
                     input_dir = root
@@ -106,6 +107,7 @@ def compress_dataset(properties):
                     compression_results[i][j][k] = compressed_file_size / original_file_size
 
                     n += 1
+                    k += 1
                     print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
 
     compression_results = np.mean(compression_results * 100, axis=-1).astype('str')
