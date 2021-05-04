@@ -31,7 +31,7 @@ class ExperimentProperties:
         Contains the properties for a test/evaluation experiment.
     """
 
-    def __init__(self, dataset_dir='../dataset/train', output_dir='output', models=['hific-hi'],
+    def __init__(self, dataset_dir='../tiny-dataset', output_dir='./output', models=['hific-hi'],
                  interpolation_methods=['linear'], interpolation_depths=[1],
                  evaluation_metrics=['msssim']):
         """
@@ -61,6 +61,10 @@ def compress_dataset(properties):
     print('Compression of dataset files...')
 
     len_models, len_interpolation_depths = len(properties.models), len(properties.interpolation_depths)
+
+    # count sequences
+    for root, dirs, files in os.walk(properties.dataset_dir):
+                if 'img1.png' in files: 
 
     compression_results = np.zeros((len_models, len_interpolation_depths, len_dataset_files))
     process_steps = len_models * len_interpolation_depths * len_dataset_files
