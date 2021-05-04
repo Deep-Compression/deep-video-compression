@@ -143,28 +143,30 @@ def decompress_dataset(properties):
 
     for i, model in enumerate(properties.models):
         for j, depth in enumerate(properties.interpolation_depths):
-            compressed_files_dir = properties.output_dir + '/compressed/{}/depth_{}'.format(model, depth)
+            k = 0
+            for root, dirs, files in os.walk(properties.dataset_dir):
+                if 'im1.png' in files:
+                    output_path = properties.output_dir + '/compressed/{}/depth_{}/'.format(model, depth)
+                    input_file_name = root.replace('/', '').replace('.', '') + '.dvc'
+                    input_file = output_path + input_file_name
+                    output_file_name = root.replace('/', '').replace('.', '') + '.keyframes'
+                    output_file = output_path + output_file_name
 
-            for k, file in enumerate(properties.dataset_files):
-                input_file = compressed_files_dir + '/' + os.path.splitext(file)[0] + '.dvc'
-                output_file = properties.output_dir + '/decompressed/key_frames/{}/depth_{}/'. \
-                    format(model, depth) + os.path.splitext(file)[0] + '.keyframes'
+                    dictionary = pickle.load(open(input_file, 'rb'))
+                    decompressed_frames = decompress_process(
+                        packed_tensors=dictionary['packed_tensors'],
+                        model=dictionary['model'],
+                        print_log_messages=False,
+                        print_progress=False
+                    )
+                    Path('/'.join(output_file.split('/')[0:-1])).mkdir(parents=True, exist_ok=True)
+                    pickle.dump({'frames': decompressed_frames, 'num_end_frames': dictionary['num_end_frames'],
+                                'fps': dictionary['fps']}, open(output_file, 'wb'))
 
-                dictionary = pickle.load(open(input_file, 'rb'))
-                decompressed_frames = decompress_process(
-                    packed_tensors=dictionary['packed_tensors'],
-                    model=dictionary['model'],
-                    print_log_messages=False,
-                    print_progress=False
-                )
-
-                Path('/'.join(output_file.split('/')[0:-1])).mkdir(parents=True, exist_ok=True)
-                pickle.dump({'frames': decompressed_frames, 'num_end_frames': dictionary['num_end_frames'],
-                             'fps': dictionary['fps']}, open(output_file, 'wb'))
-
-                n += 1
-                print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
-
+                    n += 1
+                    k += 1
+                    print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
+                    
     print('Decompression complete!\n')
 
 
