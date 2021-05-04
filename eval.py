@@ -135,7 +135,7 @@ def decompress_dataset(properties):
     print('Decompression of dataset key frames...')
 
     len_models, len_interpolation_depths, len_dataset_files = len(properties.models), len(
-        properties.interpolation_depths), len(properties.dataset_files)
+        properties.interpolation_depths), len(os.listdir(properties.output_dir))
     process_steps = len_models * len_interpolation_depths * len_dataset_files
 
     n = 0
