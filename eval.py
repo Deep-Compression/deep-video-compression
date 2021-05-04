@@ -31,7 +31,7 @@ class ExperimentProperties:
         Contains the properties for a test/evaluation experiment.
     """
 
-    def __init__(self, dataset_dir='dataset/train', output_dir='output', models=['hific-hi'],
+    def __init__(self, dataset_dir='../dataset/train', output_dir='output', models=['hific-hi'],
                  interpolation_methods=['linear'], interpolation_depths=[1],
                  evaluation_metrics=['msssim']):
         """
