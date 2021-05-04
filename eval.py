@@ -68,6 +68,11 @@ def compress_dataset(properties):
         if 'img1.png' in files:
             len_dataset_files += 1
 
+    print('...with HiFiC models:' + properties.models)
+    print('...with interpolation methods:' + properties.interpolation_methods)
+    print('...with interpolation depths:' + properties.interpolation_depths)
+    print('...number sequences in dataset:' + str(len_dataset_files))
+    
     compression_results = np.zeros((len_models, len_interpolation_depths, len_dataset_files))
     process_steps = len_models * len_interpolation_depths * len_dataset_files
 
