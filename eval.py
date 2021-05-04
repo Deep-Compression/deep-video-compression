@@ -87,7 +87,7 @@ def compress_dataset(properties):
                     input_dir = root
 
                     output_path = properties.output_dir + '/compressed/{}/depth_{}/'.format(model, depth)
-                    file_name = root.replace('/', '') + '.dvc'
+                    file_name = root.replace('/', '').replace('.', '') + '.dvc'
                     output_file = output_path + file_name
 
                     print('Saving', file_name, 'to', output_path)
