@@ -21,14 +21,19 @@ def compress_sequence(input_path, output_file='compressed_video.dvc', model='hif
         :return: Dictionary including packed tensors of the compressed video and compression properties
     """
     # load frames into array
-    frames_to_compress = []
+    sequence = []
     file_list = os.listdir(input_path)
     for image in file_list:
         if len(os.path.basename(image)) == 7:
-            frames_to_compress.append(cv2.imread(image))
+            sequence.append(cv2.imread(image))
 
     num_frames = len(file_list)
     num_end_frames = (num_frames - 1) % (2 ** interpolation_depth) + 1
+
+    frames_to_compress = []
+    for n, frame in enumerate(sequence):
+        if n % (2 ** interpolation_depth) == 0 or n >= num_frames - num_end_frames:
+            frames_to_compress.append(frame)
 
     if num_frames < 1:
         raise RuntimeError('Sequence has no images (\'{}\').'.format(input_path))
