@@ -63,8 +63,10 @@ def compress_dataset(properties):
     len_models, len_interpolation_depths = len(properties.models), len(properties.interpolation_depths)
 
     # count sequences
+    len_dataset_files = 0
     for root, dirs, files in os.walk(properties.dataset_dir):
-                if 'img1.png' in files: 
+        if 'img1.png' in files:
+            len_dataset_files += 1
 
     compression_results = np.zeros((len_models, len_interpolation_depths, len_dataset_files))
     process_steps = len_models * len_interpolation_depths * len_dataset_files
