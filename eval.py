@@ -18,7 +18,7 @@ from frame_interpolation.linear import linear_interpolation
 from helper.video_writer import write_frames_to_video
 from image_compression.hific_decompression import decompress_process
 
-from deep_video_compression.compress_video import compress_sequence
+from deep_video_compression.compress_sequence import compress_sequence
 from metrics.multi_scale_ssim import multi_scale_ssim
 from metrics.psnr import calculate_psnr
 #from metrics.PerceptualSimilarity.lpips import calculate_lpips
