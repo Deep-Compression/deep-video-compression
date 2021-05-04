@@ -99,8 +99,8 @@ def compress_dataset(properties):
 
                     original_file_size = 0
                     for file in files:
-                        if len(os.path.basename(image)) == 7:
-                            original_file_size += os.path.getsize(file)
+                        if len(file) == 7:
+                            original_file_size += os.path.getsize(root + '/' + file)
 
                     compressed_file_size = os.path.getsize(output_file)
                     compression_results[i][j][k] = compressed_file_size / original_file_size
