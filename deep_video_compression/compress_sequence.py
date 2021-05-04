@@ -27,6 +27,8 @@ def compress_sequence(input_path, output_file='compressed_video.dvc', model='hif
         if len(os.path.basename(image)) == 7:
             sequence.append(cv2.imread(image))
 
+    print(sequence)
+
     num_frames = len(sequence)
     num_end_frames = (num_frames - 1) % (2 ** interpolation_depth) + 1
 
@@ -34,6 +36,8 @@ def compress_sequence(input_path, output_file='compressed_video.dvc', model='hif
     for n, frame in enumerate(sequence):
         if n % (2 ** interpolation_depth) == 0 or n >= num_frames - num_end_frames:
             frames_to_compress.append(frame)
+    
+    print(frames_to_compress)
 
     if num_frames < 1:
         raise RuntimeError('Sequence has no images (\'{}\').'.format(input_path))
