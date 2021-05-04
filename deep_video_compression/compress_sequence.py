@@ -27,7 +27,7 @@ def compress_sequence(input_path, output_file='compressed_video.dvc', model='hif
         if len(os.path.basename(image)) == 7:
             sequence.append(cv2.imread(image))
 
-    num_frames = len(file_list)
+    num_frames = len(sequence)
     num_end_frames = (num_frames - 1) % (2 ** interpolation_depth) + 1
 
     frames_to_compress = []
