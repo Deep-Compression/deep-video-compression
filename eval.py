@@ -90,8 +90,6 @@ def compress_dataset(properties):
                     file_name = root.replace('/', '').replace('.', '') + '.dvc'
                     output_file = output_path + file_name
 
-                    print('Saving', file_name, 'to', output_path)
-
                     compress_sequence(
                         input_path=input_dir,
                         output_file=output_file,
@@ -134,8 +132,14 @@ def decompress_dataset(properties):
     """
     print('Decompression of dataset key frames...')
 
-    len_models, len_interpolation_depths, len_dataset_files = len(properties.models), len(
-        properties.interpolation_depths), len(os.listdir(properties.output_dir))
+    len_models, len_interpolation_depths = len(properties.models), len(properties.interpolation_depths)
+
+    # count sequences
+    len_dataset_files = 0
+    for root, dirs, files in os.walk(properties.dataset_dir):
+        if 'im1.png' in files:
+            len_dataset_files += 1
+
     process_steps = len_models * len_interpolation_depths * len_dataset_files
 
     n = 0
@@ -166,7 +170,7 @@ def decompress_dataset(properties):
                     n += 1
                     k += 1
                     print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
-                    
+
     print('Decompression complete!\n')
 
 
