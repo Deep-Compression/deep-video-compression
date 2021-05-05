@@ -282,7 +282,7 @@ def evaluate(properties):
                         file_list = os.listdir(root)
                         for image in file_list:
                             if len(image) == 7:
-                                sequence.append(cv2.imread(input_path + '/' + image))
+                                sequence.append(cv2.imread(root + '/' + image))
 
                         original_frames = np.array(sequence)
 
