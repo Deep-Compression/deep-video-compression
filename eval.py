@@ -246,8 +246,14 @@ def evaluate(properties):
 
         :param properties: Experiment properties
     """
-    len_models, len_interpolation_depths, len_dataset_files = len(properties.models), len(
-        properties.interpolation_depths), len(properties.dataset_files)
+    len_models, len_interpolation_depths = len(properties.models), len(properties.interpolation_depths)
+    
+    # count sequences
+    len_dataset_files = 0
+    for root, dirs, files in os.walk(properties.dataset_dir):
+        if 'im1.png' in files:
+            len_dataset_files += 1
+    
     process_steps = len_models * len_interpolation_depths * len_dataset_files
 
     for method in properties.interpolation_methods:
@@ -264,28 +270,40 @@ def evaluate(properties):
             for j, depth in enumerate(properties.interpolation_depths):
                 frames_dir = properties.output_dir + '/decompressed/frames/{}/{}/depth_{}'.format(method, model, depth)
 
-                for k, file in enumerate(properties.dataset_files):
-                    frames_file = frames_dir + '/' + os.path.splitext(file)[0] + '.frames'
-                    frames_dict = pickle.load(open(frames_file, 'rb'))
-
-                    original_frames = np.array(video_to_frames(properties.dataset_dir + '/' + file))
-                    
-                    # ToDo: to be made to write into only one 'results' list and reduce redundancy concerning the results operations
-                    for l, metric in enumerate(properties.evaluation_metrics):
-                        if metric == 'msssim':
-                            results_msssim[i][j][k] = multi_scale_ssim(original_frames, frames_dict['frames'])
+                k = 0
+                for root, dirs, files in os.walk(properties.dataset_dir):
+                    if 'im1.png' in files:
+                        frames_file = frames_dir + '/' + root.replace('/', '').replace('.', '') + '.frames'
+                        frames_dict = pickle.load(open(frames_file, 'rb'))
                         
-                        elif metric == 'psnr':
-                            for m, original_frame in enumerate(original_frames):
-                                results_psnr[i][j][k][m] = calculate_psnr(original_frame, frames_dict['frames'][m])
+                        # load frames into array
+                        sequence = []
+                        file_list = os.listdir(root)
+                        for image in file_list:
+                            if len(image) == 7:
+                                sequence.append(cv2.imread(input_path + '/' + image))
+
+                        original_frames = np.array(sequence)
+
+                        # original_frames = np.array(video_to_frames(properties.dataset_dir + '/' + file))
+
+                        # ToDo: to be made to write into only one 'results' list and reduce redundancy concerning the results operations
+                        for l, metric in enumerate(properties.evaluation_metrics):
+                            if metric == 'msssim':
+                                results_msssim[i][j][k] = multi_scale_ssim(original_frames, frames_dict['frames'])
+                            
+                            elif metric == 'psnr':
+                                for m, original_frame in enumerate(original_frames):
+                                    results_psnr[i][j][k][m] = calculate_psnr(original_frame, frames_dict['frames'][m])
+                            
+                            elif metric == 'lpips':
+                                for m, original_frame in enumerate(original_frames):
+                                    results_lpips[i][j][k][m] = calculate_lpips(original_frame, frames_dict['frames'][m])
+
+                        n += 1
+                        k += 1
+                        print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
                         
-                        elif metric == 'lpips':
-                            for m, original_frame in enumerate(original_frames):
-                                results_lpips[i][j][k][m] = calculate_lpips(original_frame, frames_dict['frames'][m])
-
-                    n += 1
-                    print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
-
         results_msssim = np.mean(results_msssim, axis=-1).astype('str')
         results_psnr = np.mean(results_psnr, axis=-1).astype('str')
         results_lpips = np.mean(results_lpips, axis=-1).astype('str')
