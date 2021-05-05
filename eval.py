@@ -153,7 +153,7 @@ def decompress_dataset(properties):
                     output_path = properties.output_dir + '/compressed/{}/depth_{}/'.format(model, depth)
                     input_file_name = root.replace('/', '').replace('.', '') + '.dvc'
                     input_file = output_path + input_file_name
-                    output_file_name = root.replace('/', '').replace('.', '') + '.keyframes'
+                    output_file_name = input_file_name.replace('.dvc', '.keyframes')
                     output_file = output_path + output_file_name
 
                     dictionary = pickle.load(open(input_file, 'rb'))
@@ -180,8 +180,14 @@ def interpolate_frames(properties):
 
         :param properties: Experiment properties
     """
-    len_models, len_interpolation_depths, len_dataset_files = len(properties.models), len(
-        properties.interpolation_depths), len(properties.dataset_files)
+    len_models, len_interpolation_depths = len(properties.models), len(properties.interpolation_depths)
+    
+    # count sequences
+    len_dataset_files = 0
+    for root, dirs, files in os.walk(properties.dataset_dir):
+        if 'im1.png' in files:
+            len_dataset_files += 1
+    
     process_steps = len_models * len_interpolation_depths * len_dataset_files
 
     for method in properties.interpolation_methods:
@@ -203,31 +209,32 @@ def interpolate_frames(properties):
             for depth in properties.interpolation_depths:
                 key_frames_dir = properties.output_dir + '/decompressed/key_frames/{}/depth_{}'.format(model, depth)
 
-                for file in properties.dataset_files:
-                    key_frames_file = key_frames_dir + '/' + os.path.splitext(file)[0] + '.keyframes'
-                    key_frames_dict = pickle.load(open(key_frames_file, 'rb'))
+                for root, dirs, files in os.walk(properties.dataset_dir):
+                    if 'im1.png' in files:
+                        key_frames_dict = properties.output_dir + '/compressed/{}/depth_{}/'.format(model, depth)
+                        key_frames_file = key_frames_dict + root.replace('/', '').replace('.', '') + '.keyframes'
 
-                    frames = np.asarray(interpolate_frames_process(
-                        key_frames=key_frames_dict['frames'],
-                        num_end_frames=key_frames_dict['num_end_frames'],
-                        method=interpolation_function,
-                        depth=depth,
-                        print_log_messages=False,
-                        print_progress=False
-                    ))
+                        frames = np.asarray(interpolate_frames_process(
+                            key_frames=key_frames_dict['frames'],
+                            num_end_frames=key_frames_dict['num_end_frames'],
+                            method=interpolation_function,
+                            depth=depth,
+                            print_log_messages=False,
+                            print_progress=False
+                        ))
 
-                    output_file = properties.output_dir + '/decompressed/frames/{}/{}/depth_{}/' \
-                        .format(method, model, depth) + os.path.splitext(file)[0] + '.frames'
-                    Path('/'.join(output_file.split('/')[0:-1])).mkdir(parents=True, exist_ok=True)
+                        output_file = properties.output_dir + '/decompressed/frames/{}/{}/depth_{}/' \
+                            .format(method, model, depth) + root.replace('/', '').replace('.', '') + '.frames'
+                        Path('/'.join(output_file.split('/')[0:-1])).mkdir(parents=True, exist_ok=True)
 
-                    pickle.dump({'frames': frames}, open(output_file, 'wb'))
+                        pickle.dump({'frames': frames}, open(output_file, 'wb'))
 
-                    output_file = properties.output_dir + '/decompressed/videos/{}/{}/depth_{}/' \
-                        .format(method, model, depth) + os.path.splitext(file)[0] + '.mp4'
-                    write_frames_to_video(output_file, frames, key_frames_dict['fps'], print_log_messages=False)
+                        output_file = properties.output_dir + '/decompressed/videos/{}/{}/depth_{}/' \
+                            .format(method, model, depth) + root.replace('/', '').replace('.', '') + '.mp4'
+                        write_frames_to_video(output_file, frames, key_frames_dict['fps'], print_log_messages=False)
 
-                    n += 1
-                    print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
+                        n += 1
+                        print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
 
         print('Interpolation of intermediate frames using {} interpolation complete!\n'.format(method))
 
