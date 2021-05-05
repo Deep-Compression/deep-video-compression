@@ -211,8 +211,9 @@ def interpolate_frames(properties):
 
                 for root, dirs, files in os.walk(properties.dataset_dir):
                     if 'im1.png' in files:
-                        key_frames_dict = properties.output_dir + '/compressed/{}/depth_{}/'.format(model, depth)
-                        key_frames_file = key_frames_dict + root.replace('/', '').replace('.', '') + '.keyframes'
+                        output_path = properties.output_dir + '/compressed/{}/depth_{}/'.format(model, depth)
+                        key_frames_file = output_path + root.replace('/', '').replace('.', '') + '.keyframes'
+                        key_frames_dict = pickle.load(open(key_frames_file, 'rb'))
 
                         frames = np.asarray(interpolate_frames_process(
                             key_frames=key_frames_dict['frames'],
