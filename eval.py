@@ -33,7 +33,7 @@ class ExperimentProperties:
     """
 
     def __init__(self, dataset_dir='../tiny-dataset', output_dir='./output', models=['hific-hi'],
-                 interpolation_methods=['linear'], interpolation_depths=[1],
+                 interpolation_methods=['linear', 'sepconv_slomo'], interpolation_depths=[1],
                  evaluation_metrics=['msssim']):
         """
             :param dataset_dir: Dataset directory
