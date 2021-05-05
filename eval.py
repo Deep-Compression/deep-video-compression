@@ -15,7 +15,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # disable tensorflow debug output
 
 from frame_interpolation.interpolation import interpolate_frames_process
 from frame_interpolation.linear import linear_interpolation
-#from frame_interpolation.sepconv_slomo import sepconv_slomo_interpolation
+from frame_interpolation.sepconv_slomo import sepconv_slomo_interpolation
 from helper.video_writer import write_frames_to_video
 from image_compression.hific_decompression import decompress_process
 
