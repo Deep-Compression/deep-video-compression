@@ -8,6 +8,7 @@ import pickle
 from pathlib import Path
 
 import numpy as np
+import cv2
 from terminaltables import AsciiTable
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # disable tensorflow debug output
