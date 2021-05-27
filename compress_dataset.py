@@ -58,4 +58,10 @@ for model in MODELS:
                     n += 1
                     print_progress_bar(n, NUM_SEQUENCES, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES))
 
-    print('\nMean compression factor for ' + model + ':', total_original_size / total_compressed_size, '\n')
+    out_string = '\nMean compression factor for ' + model + ':' + str(total_original_size / total_compressed_size)
+    out_string += '\n' 'Total size of original sequence:' + str(total_original_size)
+    out_string += '\n' 'Total size of compressed sequence:' + str(total_compressed_size) + '\n'
+    print(out_string)
+
+    with open('compression_output.txt', 'a') as f:
+        f.write(out_string)
