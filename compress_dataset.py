@@ -35,7 +35,7 @@ for model in MODELS:
             total_original_size = 0
             total_compressed_size = 0
 
-            for root, dirs, files in os.walk(DATASET_DIR):
+            for root, _, files in os.walk(DATASET_DIR):
                 if 'im1.png' in files:
                     out_root = COMPRESSED_DIR + '/' + model + root[10:]
                     files = [file for file in files if len(file) == 7]
