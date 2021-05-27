@@ -24,7 +24,7 @@ for method in INTERPOLATION_METHODS:
         print('Interpolation with ' + str(2 ** depth - 1) + ' intermediate frames...')
 
         n = 0
-        print_progress_bar(n, NUM_SEQUENCES, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES))
+        print_progress_bar(n, NUM_SEQUENCES * 3, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES * 3))
 
         if depth not in [1, 2]:
             raise Exception('Interpolation depth too low or too high.')
@@ -58,7 +58,7 @@ for method in INTERPOLATION_METHODS:
                     cv2.imwrite(out_path, frame)
 
                 n += 1
-                print_progress_bar(n, NUM_SEQUENCES, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES))
+                print_progress_bar(n, NUM_SEQUENCES * 3, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES * 3))
 
         print()
     print()

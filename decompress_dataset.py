@@ -53,4 +53,4 @@ for model in MODELS:
                     n += 1
                     print_progress_bar(n, NUM_SEQUENCES, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES))
 
-        print()
+    print('\n')
