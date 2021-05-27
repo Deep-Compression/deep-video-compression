@@ -1,80 +1,72 @@
 import os
 import pickle
+from builtins import len
 from pathlib import Path
+
+import cv2
 import numpy as np
 
-from frame_interpolation.interpolation import interpolate_frames_process
+from config import *
 from frame_interpolation.linear import linear_interpolation
 from frame_interpolation.sepconv_slomo import sepconv_slomo_interpolation
-
 from helper.print_progress_bar import print_progress_bar
-from helper.video_writer import write_frames_to_video
 
-from config import *
+for method in INTERPOLATION_METHODS:
+    print('Interpolation of decompressed files using ' + method + '...')
 
+    if method == 'linear':
+        interpolation_function = linear_interpolation
 
-def interpolate_frames():
-    """
-        Interpolates intermediate frames between decompressed key frames and writes generated videos to file.
+    elif method == 'sepconv_slomo':
+        interpolation_function = sepconv_slomo_interpolation
 
-        :param properties: Experiment properties
-    """
-    len_models, len_interpolation_depths = len(MODELS), len(INTERPOLATION_DEPTHS)
-    
-    # count sequences
-    len_dataset_files = 0
-    for root, dirs, files in os.walk(DATASET_DIR):
-        if 'im1.png' in files:
-            len_dataset_files += 1
-    
-    process_steps = len_models * len_interpolation_depths * len_dataset_files
+    else:
+        raise RuntimeError('Invalid interpolation method \'{}\'.'.format(method))
 
-    for method in INTERPOLATION_METHODS:
-        print('Interpolating frames using {} interpolation and evaluating the results...'.format(method))
+    for depth in INTERPOLATION_DEPTHS:
+        print('Interpolation with ' + str(2 ** depth - 1) + ' intermediate frames...')
 
         n = 0
-        print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
+        print_progress_bar(n, NUM_SEQUENCES, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES))
 
-        if method == 'linear':
-            interpolation_function = linear_interpolation
+        if depth not in [1, 2]:
+            raise Exception('Interpolation depth too low or too high.')
 
-        elif method == 'sepconv_slomo':
-            interpolation_function = sepconv_slomo_interpolation
+        if depth == 1:
+            key_frame_indices = [1, 3, 5, 7]
 
         else:
-            raise RuntimeError('Invalid interpolation method (\'{}\').'.format(method))
+            key_frame_indices = [2, 6]
 
-        for model in MODELS:
-            for depth in INTERPOLATION_DEPTHS:
-                key_frames_dir = OUTPUT_DIR + '/decompressed/key_frames/{}/depth_{}'.format(model, depth)
+        for root, _, files in os.walk(DECOMPRESSED_DIR):
+            if 'im1.png' in files:
+                out_root = INTERPOLATED_DIR + root[21:]
 
-                for root, dirs, files in os.walk(DATASET_DIR):
-                    if 'im1.png' in files:
-                        output_path = OUTPUR_DIR + '/compressed/{}/depth_{}/'.format(model, depth)
-                        key_frames_file = output_path + root.replace('/', '').replace('.', '') + '.keyframes'
-                        key_frames_dict = pickle.load(open(key_frames_file, 'rb'))
+                frames = []
 
-                        frames = np.asarray(interpolate_frames_process(
-                            key_frames=key_frames_dict['frames'],
-                            num_end_frames=key_frames_dict['num_end_frames'],
-                            method=interpolation_function,
-                            depth=depth,
-                            print_log_messages=False,
-                            print_progress=False
-                        ))
+                for i in range(len(key_frame_indices) - 1):
+                    first_frame = cv2.imread(root + '/im' + str(key_frame_indices[i]) + '.png')
+                    first_frame = np.expand_dims(first_frame, 0)
 
-                        output_file = OUTPUR_DIR + '/decompressed/frames/{}/{}/depth_{}/' \
-                            .format(method, model, depth) + root.replace('/', '').replace('.', '') + '.frames'
-                        Path('/'.join(output_file.split('/')[0:-1])).mkdir(parents=True, exist_ok=True)
+                    second_frame = cv2.imread(root + '/im' + str(key_frame_indices[i + 1]) + '.png')
+                    second_frame = np.expand_dims(second_frame, 0)
 
-                        pickle.dump({'frames': frames}, open(output_file, 'wb'))
+                    intermediate_frames = interpolation_function(first_frame, second_frame, depth)
 
-                        output_file = OUTPUR_DIR + '/decompressed/videos/{}/{}/depth_{}/' \
-                            .format(method, model, depth) + root.replace('/', '').replace('.', '') + '.mp4'
-                        write_frames_to_video(output_file, frames, key_frames_dict['fps'], print_log_messages=False)
+                    frames.append(first_frame)
+                    frames.extend(intermediate_frames)
 
-                        n += 1
-                        print_progress_bar(n, process_steps, suffix='({}/{} files)'.format(n, process_steps))
+                frames.append(second_frame)
 
-        print('Interpolation of intermediate frames using {} interpolation complete!\n'.format(method))
+                for j, frame in enumerate(frames):
+                    out_path = out_root + '/depth_' + str(depth) + '/im' + str(j + 1) + '.png'
+                    Path('/'.join(out_path.split('/')[0:-1])).mkdir(parents=True, exist_ok=True)
 
+                    frame = np.squeeze(frame, 0)
+                    cv2.imwrite(out_path, frame)
+
+                n += 1
+                print_progress_bar(n, NUM_SEQUENCES, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES))
+
+        print()
+    print()

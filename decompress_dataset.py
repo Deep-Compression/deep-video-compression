@@ -31,7 +31,7 @@ for model in MODELS:
         inputs = [inputs[k] for k in sorted(inputs) if k.startswith('channel:')]
 
         with tf.Session() as session:
-            for root, dirs, files in os.walk(COMPRESSED_DIR + '/' + model):
+            for root, _, files in os.walk(COMPRESSED_DIR + '/' + model):
                 if 'im1.dc' in files:
                     out_root = DECOMPRESSED_DIR + root[19:]
                     files = [file for file in files if len(file) == 6]
