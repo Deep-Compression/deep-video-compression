@@ -10,23 +10,26 @@ from frame_interpolation.sepconv_slomo import sepconv_slomo_interpolation
 from helper.print_progress_bar import print_progress_bar
 from helper.video_writer import write_frames_to_video
 
-def interpolate_frames(properties):
+from config import *
+
+
+def interpolate_frames():
     """
         Interpolates intermediate frames between decompressed key frames and writes generated videos to file.
 
         :param properties: Experiment properties
     """
-    len_models, len_interpolation_depths = len(properties.models), len(properties.interpolation_depths)
+    len_models, len_interpolation_depths = len(MODELS), len(INTERPOLATION_DEPTHS)
     
     # count sequences
     len_dataset_files = 0
-    for root, dirs, files in os.walk(properties.dataset_dir):
+    for root, dirs, files in os.walk(DATASET_DIR):
         if 'im1.png' in files:
             len_dataset_files += 1
     
     process_steps = len_models * len_interpolation_depths * len_dataset_files
 
-    for method in properties.interpolation_methods:
+    for method in INTERPOLATION_METHODS:
         print('Interpolating frames using {} interpolation and evaluating the results...'.format(method))
 
         n = 0
@@ -41,13 +44,13 @@ def interpolate_frames(properties):
         else:
             raise RuntimeError('Invalid interpolation method (\'{}\').'.format(method))
 
-        for model in properties.models:
-            for depth in properties.interpolation_depths:
-                key_frames_dir = properties.output_dir + '/decompressed/key_frames/{}/depth_{}'.format(model, depth)
+        for model in MODELS:
+            for depth in INTERPOLATION_DEPTHS:
+                key_frames_dir = OUTPUT_DIR + '/decompressed/key_frames/{}/depth_{}'.format(model, depth)
 
-                for root, dirs, files in os.walk(properties.dataset_dir):
+                for root, dirs, files in os.walk(DATASET_DIR):
                     if 'im1.png' in files:
-                        output_path = properties.output_dir + '/compressed/{}/depth_{}/'.format(model, depth)
+                        output_path = OUTPUR_DIR + '/compressed/{}/depth_{}/'.format(model, depth)
                         key_frames_file = output_path + root.replace('/', '').replace('.', '') + '.keyframes'
                         key_frames_dict = pickle.load(open(key_frames_file, 'rb'))
 
@@ -60,13 +63,13 @@ def interpolate_frames(properties):
                             print_progress=False
                         ))
 
-                        output_file = properties.output_dir + '/decompressed/frames/{}/{}/depth_{}/' \
+                        output_file = OUTPUR_DIR + '/decompressed/frames/{}/{}/depth_{}/' \
                             .format(method, model, depth) + root.replace('/', '').replace('.', '') + '.frames'
                         Path('/'.join(output_file.split('/')[0:-1])).mkdir(parents=True, exist_ok=True)
 
                         pickle.dump({'frames': frames}, open(output_file, 'wb'))
 
-                        output_file = properties.output_dir + '/decompressed/videos/{}/{}/depth_{}/' \
+                        output_file = OUTPUR_DIR + '/decompressed/videos/{}/{}/depth_{}/' \
                             .format(method, model, depth) + root.replace('/', '').replace('.', '') + '.mp4'
                         write_frames_to_video(output_file, frames, key_frames_dict['fps'], print_log_messages=False)
 
