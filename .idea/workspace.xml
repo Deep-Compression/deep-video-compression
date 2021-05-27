@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="bdf5ab1f-8fa3-43a2-921c-a21a091e8c0b" name="Default Changelist" comment="">
+    <list default="true" id="d9578d03-4514-4782-a4e6-90dfef2185ce" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/compress_dataset.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/decompress_dataset.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/video_compression.py" beforeDir="false" afterPath="$PROJECT_DIR$/video_compression.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eval.py" beforeDir="false" afterPath="$PROJECT_DIR$/eval.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/metrics/PerceptualSimilarity/lpips.py" beforeDir="false" afterPath="$PROJECT_DIR$/metrics/PerceptualSimilarity/run_lpips.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sepconv_slomo/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/sepconv_slomo/run.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,17 +23,15 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="feature/pipeline" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitSEFilterConfiguration">
-    <file-type-list>
-      <filtered-out-file-type name="LOCAL_BRANCH" />
-      <filtered-out-file-type name="REMOTE_BRANCH" />
-      <filtered-out-file-type name="TAG" />
-      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
-    </file-type-list>
-  </component>
-  <component name="ProjectId" id="1nTyLulLPaxynnAUSQ6AVlmAp6F" />
+  <component name="ProjectId" id="1oyDprrbc9hd7eNTlIfUsXF1DkZ" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -36,38 +39,38 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$" />
-    </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="bdf5ab1f-8fa3-43a2-921c-a21a091e8c0b" name="Default Changelist" comment="" />
-      <created>1611428324891</created>
+      <changelist id="d9578d03-4514-4782-a4e6-90dfef2185ce" name="Default Changelist" comment="" />
+      <created>1614250122570</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1611428324891</updated>
+      <updated>1614250122570</updated>
     </task>
-    <task id="LOCAL-00001" summary="Added linear frame interpolation">
-      <created>1612039035689</created>
+    <task id="LOCAL-00001" summary="Refactoring and implementation of testing/evaluation pipeline">
+      <created>1614250383120</created>
       <option name="number" value="00001" />
       <option name="presentableId" value="LOCAL-00001" />
       <option name="project" value="LOCAL" />
-      <updated>1612039035689</updated>
+      <updated>1614250383120</updated>
     </task>
-    <task id="LOCAL-00002" summary="Added sepconv slomo interpolation and refactored hific_video_compression.py file (refactored file is video_compression.py)">
-      <created>1612346523651</created>
+    <task id="LOCAL-00002" summary="Separated interpolation and evaluation in eval.py">
+      <created>1614776112645</created>
       <option name="number" value="00002" />
       <option name="presentableId" value="LOCAL-00002" />
       <option name="project" value="LOCAL" />
-      <updated>1612346523651</updated>
+      <updated>1614776112645</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Typo">
+      <created>1614776427977</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1614776427977</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -83,8 +86,9 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added linear frame interpolation" />
-    <MESSAGE value="Added sepconv slomo interpolation and refactored hific_video_compression.py file (refactored file is video_compression.py)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added sepconv slomo interpolation and refactored hific_video_compression.py file (refactored file is video_compression.py)" />
+    <MESSAGE value="Refactoring and implementation of testing/evaluation pipeline" />
+    <MESSAGE value="Separated interpolation and evaluation in eval.py" />
+    <MESSAGE value="Typo" />
+    <option name="LAST_COMMIT_MESSAGE" value="Typo" />
   </component>
 </project>

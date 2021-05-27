@@ -22,7 +22,7 @@ from image_compression.hific_decompression import decompress_process
 from deep_video_compression.compress_sequence import compress_sequence
 from metrics.multi_scale_ssim import multi_scale_ssim
 from metrics.psnr import calculate_psnr
-#from metrics.PerceptualSimilarity.lpips import calculate_lpips
+from metrics.PerceptualSimilarity.run_lpips import calculate_lpips
 from helper.video_to_frames import video_to_frames
 from helper.print_progress_bar import print_progress_bar
 
@@ -32,9 +32,9 @@ class ExperimentProperties:
         Contains the properties for a test/evaluation experiment.
     """
 
-    def __init__(self, dataset_dir='../tiny-dataset', output_dir='./output', models=['hific-hi'],
-                 interpolation_methods=['linear', 'sepconv_slomo'], interpolation_depths=[1],
-                 evaluation_metrics=['msssim']):
+    def __init__(self, dataset_dir='../dataset', output_dir='./output', models=['hific-hi'],
+                 interpolation_methods=['linear', 'sepconv_slomo'], interpolation_depths=[1, 2],
+                 evaluation_metrics=['msssim', 'psnr', 'lpips']):
         """
             :param dataset_dir: Dataset directory
             :param output_dir: Output directory
@@ -65,6 +65,7 @@ def compress_dataset(properties):
 
     # count sequences
     len_dataset_files = 0
+
     for root, dirs, files in os.walk(properties.dataset_dir):
         if 'im1.png' in files:
             len_dataset_files += 1

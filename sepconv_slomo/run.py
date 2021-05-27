@@ -14,10 +14,12 @@ import sys
 import tempfile
 import time
 
-try:
-	from sepconv_slomo import sepconv # the custom separable convolution layer
-except:
-	sys.path.insert(0, 'sepconv'); import sepconv # you should consider upgrading python
+from sepconv_slomo.sepconv import FunctionSepconv
+
+# try:
+#	from sepconv_slomo.sepconv import FunctionSepconv # the custom separable convolution layer
+#except:
+#	sys.path.insert(0, 'sepconv'); import sepconv # you should consider upgrading python
 # end
 
 ##########################################################
