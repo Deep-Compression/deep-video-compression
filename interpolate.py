@@ -59,7 +59,7 @@ for method in INTERPOLATION_METHODS:
                 frames.append(second_frame)
 
                 for j, frame in enumerate(frames):
-                    out_path = out_root + '/depth_' + str(depth) + '/im' + str(j + 1) + '.png'
+                    out_path = out_root + '/' + method + '/depth_' + str(depth) + '/im' + str(j + 1) + '.png'
                     Path('/'.join(out_path.split('/')[0:-1])).mkdir(parents=True, exist_ok=True)
 
                     frame = np.squeeze(frame, 0)

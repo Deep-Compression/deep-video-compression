@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d9578d03-4514-4782-a4e6-90dfef2185ce" name="Default Changelist" comment="Compression and decompressio script for vimeo dataset">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compress_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/compress_dataset.py" afterDir="false" />
+    <list default="true" id="d9578d03-4514-4782-a4e6-90dfef2185ce" name="Default Changelist" comment="Interpolate script">
       <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/decompress_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/decompress_dataset.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frame_interpolation/linear.py" beforeDir="false" afterPath="$PROJECT_DIR$/frame_interpolation/linear.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/interpolate.py" beforeDir="false" afterPath="$PROJECT_DIR$/interpolate.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -76,7 +72,14 @@
       <option name="project" value="LOCAL" />
       <updated>1622139809642</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Interpolate script">
+      <created>1622142846312</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1622142846312</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -96,6 +99,7 @@
     <MESSAGE value="Separated interpolation and evaluation in eval.py" />
     <MESSAGE value="Typo" />
     <MESSAGE value="Compression and decompressio script for vimeo dataset" />
-    <option name="LAST_COMMIT_MESSAGE" value="Compression and decompressio script for vimeo dataset" />
+    <MESSAGE value="Interpolate script" />
+    <option name="LAST_COMMIT_MESSAGE" value="Interpolate script" />
   </component>
 </project>
