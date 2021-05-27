@@ -1,10 +1,7 @@
 import os
-import pickle
 from builtins import len
 from pathlib import Path
-
 import cv2
-import numpy as np
 
 from config import *
 from frame_interpolation.linear import linear_interpolation
@@ -46,10 +43,7 @@ for method in INTERPOLATION_METHODS:
 
                 for i in range(len(key_frame_indices) - 1):
                     first_frame = cv2.imread(root + '/im' + str(key_frame_indices[i]) + '.png')
-                    first_frame = np.expand_dims(first_frame, 0)
-
                     second_frame = cv2.imread(root + '/im' + str(key_frame_indices[i + 1]) + '.png')
-                    second_frame = np.expand_dims(second_frame, 0)
 
                     intermediate_frames = interpolation_function(first_frame, second_frame, depth)
 
@@ -61,8 +55,6 @@ for method in INTERPOLATION_METHODS:
                 for j, frame in enumerate(frames):
                     out_path = out_root + '/' + method + '/depth_' + str(depth) + '/im' + str(j + 1) + '.png'
                     Path('/'.join(out_path.split('/')[0:-1])).mkdir(parents=True, exist_ok=True)
-
-                    frame = np.squeeze(frame, 0)
                     cv2.imwrite(out_path, frame)
 
                 n += 1
