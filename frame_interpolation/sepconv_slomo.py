@@ -15,6 +15,7 @@ def sepconv_slomo_interpolation(first_frame, second_frame, depth):
 
         :param first_frame: First frame
         :param second_frame: Second frame
+        :param depth: Interpolation depth
         :return: Interpolated intermediate frame
     """
 
