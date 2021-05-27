@@ -21,7 +21,7 @@ def sepconv_slomo_interpolation(first_frame, second_frame, depth):
 
     if depth not in [1, 2]:
         raise ValueError("Interpolation depth must be 1 or 2")
-    
+
     first_frame_data = np.array(first_frame)[:, :, ::-1].transpose(2, 0, 1).astype(np.float32) * (1.0 / 255.0)
     first_tensor = torch.FloatTensor(np.ascontiguousarray(first_frame_data))
 
