@@ -6,5 +6,4 @@ DATASET_DIR = '../dataset'
 COMPRESSED_DIR = './output/compressed'
 DECOMPRESSED_DIR = './output/decompressed'
 INTERPOLATED_DIR = './output/interpolated'
-
-NUM_SEQUENCES = 5000
+EVALUATION_METRICS = ['msssim', 'psnr', 'lpips']
