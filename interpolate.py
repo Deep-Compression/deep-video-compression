@@ -8,6 +8,12 @@ from frame_interpolation.linear import linear_interpolation
 from frame_interpolation.sepconv_slomo import sepconv_slomo_interpolation
 from helper.print_progress_bar import print_progress_bar
 
+num_sequences = 0
+
+for _, _, files in os.walk(DATASET_DIR):
+    if 'im1.png' in files:
+        num_sequences += 1
+
 for method in INTERPOLATION_METHODS:
     print('Interpolation of decompressed files using ' + method + '...')
 
@@ -24,7 +30,7 @@ for method in INTERPOLATION_METHODS:
         print('Interpolation with ' + str(2 ** depth - 1) + ' intermediate frames...')
 
         n = 0
-        print_progress_bar(n, NUM_SEQUENCES, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES))
+        print_progress_bar(n, num_sequences * 3, suffix='({}/{} sequences)'.format(n, num_sequences * 3))
 
         if depth not in [1, 2]:
             raise Exception('Interpolation depth too low or too high.')
@@ -37,7 +43,7 @@ for method in INTERPOLATION_METHODS:
 
         for root, _, files in os.walk(DECOMPRESSED_DIR):
             if 'im1.png' in files:
-                out_root = INTERPOLATED_DIR + root[21:]
+                out_root = INTERPOLATED_DIR + '/' + method + '/depth_' + str(depth) + root[21:]
 
                 frames = []
 
@@ -53,12 +59,12 @@ for method in INTERPOLATION_METHODS:
                 frames.append(second_frame)
 
                 for j, frame in enumerate(frames):
-                    out_path = out_root + '/' + method + '/depth_' + str(depth) + '/im' + str(j + 1) + '.png'
+                    out_path = out_root + '/im' + str(j + 1) + '.png'
                     Path('/'.join(out_path.split('/')[0:-1])).mkdir(parents=True, exist_ok=True)
                     cv2.imwrite(out_path, frame)
 
                 n += 1
-                print_progress_bar(n, NUM_SEQUENCES, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES))
+                print_progress_bar(n, num_sequences * 3, suffix='({}/{} sequences)'.format(n, num_sequences * 3))
 
         print()
     print()

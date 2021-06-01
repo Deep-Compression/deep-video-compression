@@ -14,12 +14,17 @@ from config import *
 from helper.print_progress_bar import print_progress_bar
 from image_compression.hific_helper import import_metagraph, instantiate_signature
 
+num_sequences = 0
+
+for _, _, files in os.walk(DATASET_DIR):
+    if 'im1.png' in files:
+        num_sequences += 1
 
 for model in MODELS:
     print('Compression of dataset files using ' + model + '...')
 
     n = 0
-    print_progress_bar(n, NUM_SEQUENCES, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES))
+    print_progress_bar(n, num_sequences, suffix='({}/{} sequences)'.format(n, num_sequences))
 
     with tf.Graph().as_default():
         if model not in ['hific-lo', 'hific-mi', 'hific-hi']:
@@ -56,7 +61,7 @@ for model in MODELS:
                         total_compressed_size += os.path.getsize(out_root + '/' + file[:-4] + '.dc')
 
                     n += 1
-                    print_progress_bar(n, NUM_SEQUENCES, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES))
+                    print_progress_bar(n, num_sequences, suffix='({}/{} sequences)'.format(n, num_sequences))
 
     out_string = '\nMean compression factor for ' + model + ': ' + str(total_original_size / total_compressed_size)
     out_string += '\nTotal size of original sequence: ' + str(total_original_size)

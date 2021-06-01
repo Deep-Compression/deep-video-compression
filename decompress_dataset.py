@@ -14,12 +14,17 @@ from config import *
 from helper.print_progress_bar import print_progress_bar
 from image_compression.hific_helper import import_metagraph, instantiate_signature
 
+num_sequences = 0
+
+for _, _, files in os.walk(DATASET_DIR):
+    if 'im1.png' in files:
+        num_sequences += 1
 
 for model in MODELS:
     print('Decompression of dataset files using ' + model + '...')
 
     n = 0
-    print_progress_bar(n, NUM_SEQUENCES, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES))
+    print_progress_bar(n, num_sequences, suffix='({}/{} sequences)'.format(n, num_sequences))
 
     with tf.Graph().as_default():
         if model not in ['hific-lo', 'hific-mi', 'hific-hi']:
@@ -51,6 +56,6 @@ for model in MODELS:
                         cv2.imwrite(out_path, frame)
 
                     n += 1
-                    print_progress_bar(n, NUM_SEQUENCES, suffix='({}/{} sequences)'.format(n, NUM_SEQUENCES))
+                    print_progress_bar(n, num_sequences, suffix='({}/{} sequences)'.format(n, num_sequences))
 
-        print()
+    print('\n')

@@ -1,4 +1,5 @@
 #!/bin/bash
-compress_dataset.py
-decompress_dataset.py
-interpolate.py
+python compress_dataset.py
+python decompress_dataset.py
+python interpolate.py
+python evaluate.py
