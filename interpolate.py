@@ -6,6 +6,7 @@ import cv2
 from config import *
 from frame_interpolation.linear import linear_interpolation
 from frame_interpolation.sepconv_slomo import sepconv_slomo_interpolation
+from frame_interpolation.rife import rife_interpolation
 from helper.print_progress_bar import print_progress_bar
 
 num_sequences = 0
@@ -22,6 +23,9 @@ for method in INTERPOLATION_METHODS:
 
     elif method == 'sepconv_slomo':
         interpolation_function = sepconv_slomo_interpolation
+
+    elif method == 'rife':
+        interpolation_function = rife_interpolation
 
     else:
         raise RuntimeError('Invalid interpolation method \'{}\'.'.format(method))
