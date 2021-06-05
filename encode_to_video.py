@@ -22,7 +22,10 @@ def run():
                         Path(out_root).mkdir(parents=True, exist_ok=True)
 
                         frames_to_video(root, out_root, codec, bitrate)
-                        video_to_frames(out_root, codec)
+                        if depth == 1:
+                            video_to_frames(out_root, codec, 6)
+                        else:
+                            video_to_frames(out_root, codec, 4)
 
 
 def get_bitrate_for_dvc(model, root, dc_indices, depth):
@@ -62,16 +65,15 @@ def frames_to_video(root, out_root, codec, bitrate):
             {out_file}.mkv'.format(root_dict=root, out_file=out_root, bitr=str(bitrate)))
 
 
-def video_to_frames(out_root, codec):
+def video_to_frames(out_root, codec, num_frames):
     if codec == 'av1':
         suffix = '.mkv'
     elif codec == 'mp4':
         suffix = '.mp4'
 
     cam = cv2.VideoCapture(out_root + suffix)
-    frame_index = 1
 
-    while True:
+    for frame_index in range(1, num_frames):
         ret, frame = cam.read()
 
         if not ret:
@@ -79,8 +81,6 @@ def video_to_frames(out_root, codec):
 
         file_name = out_root + '/im' + str(frame_index) + '.png'
         cv2.imwrite(file_name, frame)
-
-        frame_index += 1
 
 
 if __name__ == '__main__':
