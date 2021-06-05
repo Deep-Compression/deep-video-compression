@@ -5,6 +5,7 @@ from pathlib import Path
 
 from config import *
 
+
 def run():
     for model in MODELS:
         for depth in INTERPOLATION_DEPTHS:
@@ -18,7 +19,7 @@ def run():
                     bitrate = get_bitrate_for_dvc(model, root, dc_indices, depth)
 
                     for codec in ['mp4', 'av1']:
-                        out_root = 'output/' + codec + '/' + str(bitrate) + root[10:]
+                        out_root = 'output/' + codec + '/' + model + '/depth_' + str(depth) + root[10:]
                         Path(out_root).mkdir(parents=True, exist_ok=True)
 
                         frames_to_video(root, out_root, codec, bitrate)
@@ -81,7 +82,6 @@ def video_to_frames(out_root, codec, num_frames):
 
         file_name = out_root + '/im' + str(frame_index) + '.png'
         cv2.imwrite(file_name, frame)
-
 
 if __name__ == '__main__':
     run()
