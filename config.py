@@ -7,3 +7,6 @@ COMPRESSED_DIR = './output/compressed'
 DECOMPRESSED_DIR = './output/decompressed'
 INTERPOLATED_DIR = './output/interpolated'
 EVALUATION_METRICS = ['msssim', 'psnr', 'lpips']
+
+MP4_DIR = './output/mp4'
+AV1_DIR = './output/av1'

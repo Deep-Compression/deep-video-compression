@@ -12,7 +12,7 @@ for model in MODELS:
                 total_file_size += os.path.getsize(root + '/' + file)
                 num_files += 1
 
-    print(model, total_file_size / num_files / 4)
+    print(model, total_file_size / num_files)
 
 """
     BYTES PER IMAGE -> BITRATE (BITS / SECOND, 25 FPS)
