@@ -9,14 +9,16 @@ from frame_interpolation.sepconv_slomo import sepconv_slomo_interpolation
 from frame_interpolation.rife import rife_interpolation
 from helper.print_progress_bar import print_progress_bar
 
-num_sequences = 0
+num_sequences = 1000
 
+"""
 for _, _, files in os.walk(DATASET_DIR):
     if 'im1.png' in files:
         num_sequences += 1
+"""
 
-for method in INTERPOLATION_METHODS:
-    print('Interpolation of decompressed files using ' + method + '...')
+for method in ['sepconv_slomo']:
+    print('Interpolation of jpeg files using ' + method + '...')
 
     if method == 'linear':
         interpolation_function = linear_interpolation
@@ -33,9 +35,6 @@ for method in INTERPOLATION_METHODS:
     for depth in INTERPOLATION_DEPTHS:
         print('Interpolation with ' + str(2 ** depth - 1) + ' intermediate frames...')
 
-        n = 0
-        print_progress_bar(n, num_sequences * 3, suffix='({}/{} sequences)'.format(n, num_sequences * 3))
-
         if depth not in [1, 2]:
             raise Exception('Interpolation depth too low or too high.')
 
@@ -45,30 +44,39 @@ for method in INTERPOLATION_METHODS:
         else:
             key_frame_indices = [2, 6]
 
-        for root, _, files in os.walk(DECOMPRESSED_DIR):
-            if 'im1.png' in files:
-                out_root = INTERPOLATED_DIR + '/' + method + '/depth_' + str(depth) + root[21:]
+        for model in MODELS:
+            print('Interpolation with JPEG images based on {} dc file bitrates...'.format(model))
 
-                frames = []
+            n = 0
+            print_progress_bar(n, num_sequences, suffix='({}/{} sequences)'.format(n, num_sequences))
 
-                for i in range(len(key_frame_indices) - 1):
-                    first_frame = cv2.imread(root + '/im' + str(key_frame_indices[i]) + '.png')
-                    second_frame = cv2.imread(root + '/im' + str(key_frame_indices[i + 1]) + '.png')
+            for root, _, files in os.walk('./output/jpeg/' + model):
+                if 'im1.jpg' in files:
+                    out_root = INTERPOLATED_DIR + '/' + method + '/depth_' + str(depth) + '/' + model + root[22:]
 
-                    intermediate_frames = interpolation_function(first_frame, second_frame, depth)
+                    frames = []
 
-                    frames.append(first_frame)
-                    frames.extend(intermediate_frames)
+                    for i in range(len(key_frame_indices) - 1):
+                        first_frame = cv2.imread(root + '/im' + str(key_frame_indices[i]) + '.jpg')
+                        second_frame = cv2.imread(root + '/im' + str(key_frame_indices[i + 1]) + '.jpg')
 
-                frames.append(second_frame)
+                        intermediate_frames = interpolation_function(first_frame, second_frame, depth)
 
-                for j, frame in enumerate(frames):
-                    out_path = out_root + '/im' + str(j + 1) + '.png'
-                    Path('/'.join(out_path.split('/')[0:-1])).mkdir(parents=True, exist_ok=True)
-                    cv2.imwrite(out_path, frame)
+                        frames.append(first_frame)
+                        frames.extend(intermediate_frames)
 
-                n += 1
-                print_progress_bar(n, num_sequences * 3, suffix='({}/{} sequences)'.format(n, num_sequences * 3))
+                    frames.append(second_frame)
+
+                    for j, frame in enumerate(frames):
+                        out_path = out_root + '/im' + str(j + 1) + '.png'
+                        Path('/'.join(out_path.split('/')[0:-1])).mkdir(parents=True, exist_ok=True)
+                        cv2.imwrite(out_path, frame)
+
+                    n += 1
+                    print_progress_bar(n, num_sequences, suffix='({}/{} sequences)'.format(n, num_sequences))
+
+                    if n == num_sequences:
+                        break
 
         print()
     print()

@@ -9,6 +9,7 @@ def calculate_psnr(img0, img1):
     img0 = img0.astype(np.float64)
     img1 = img1.astype(np.float64)
     mse = np.mean((img0 - img1)**2)
+
     if mse == 0:
-        return float('inf')
+        return None
     return 20 * math.log10(255.0 / math.sqrt(mse))

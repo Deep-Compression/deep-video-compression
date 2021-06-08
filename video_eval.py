@@ -5,21 +5,22 @@ import lpips
 import numpy as np
 
 from config import *
+from helper.print_progress_bar import print_progress_bar
 from metrics.PerceptualSimilarity.run_lpips import calculate_lpips
 from metrics.multi_scale_ssim import multi_scale_ssim
 from metrics.psnr import calculate_psnr
 
-num_sequences = 0
-
-for _, _, files in os.walk(DATASET_DIR):
-    if 'im1.png' in files:
-        num_sequences += 1
-
+num_sequences = 1200
 lpips_model = lpips.LPIPS(verbose=False)
 
-for vid_dir in [MP4_DIR]:  # , AV1_DIR]:
+for vid_dir in [MP4_DIR, AV1_DIR]:
     for model in MODELS:
-        for depth in INTERPOLATION_DEPTHS:
+        for depth in [0]:
+            print('Eval of {} {} depth_{}...'.format(vid_dir, model, depth))
+
+            n = 0
+            print_progress_bar(n, num_sequences, suffix='({}/{} sequences)'.format(n, num_sequences))
+
             msssim, psnr, lpips = 0, 0, 0
 
             for root, _, files in os.walk(vid_dir + '/' + model + '/depth_' + str(depth)):
@@ -40,7 +41,10 @@ for vid_dir in [MP4_DIR]:  # , AV1_DIR]:
 
                         elif metric == 'psnr':
                             for i in range(len(frames)):
-                                psnr += calculate_psnr(original_frames[i], frames[i]) / len(frames)
+                                p = calculate_psnr(original_frames[i], frames[i])
+
+                                if p is not None:
+                                    psnr += p / len(frames)
 
                         elif metric == 'lpips':
                             for i in range(len(frames)):
@@ -51,9 +55,12 @@ for vid_dir in [MP4_DIR]:  # , AV1_DIR]:
                         else:
                             raise Exception('Invalid evaluation metric \'{}\''.format(metric))
 
-            mean_msssim = msssim / num_sequences
-            mean_psnr = psnr / num_sequences
-            mean_lpips = lpips / num_sequences
+                    n += 1
+                    print_progress_bar(n, num_sequences, suffix='({}/{} sequences)'.format(n, num_sequences))
+
+            mean_msssim = msssim / n
+            mean_psnr = psnr / n
+            mean_lpips = lpips / n
 
             string = '\nEvaluation of: {} {} depth_{}\n'.format(vid_dir, model, depth)
             string += 'Mean MS-SSIM: {}\n'.format(mean_msssim)

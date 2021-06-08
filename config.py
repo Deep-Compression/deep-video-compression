@@ -1,5 +1,5 @@
 MODELS = ['hific-hi', 'hific-mi', 'hific-lo']
-INTERPOLATION_METHODS = ['rife']  # ['linear', 'sepconv_slomo']
+INTERPOLATION_METHODS = ['rife', 'linear', 'sepconv_slomo']
 INTERPOLATION_DEPTHS = [1, 2]
 
 DATASET_DIR = '../dataset'
