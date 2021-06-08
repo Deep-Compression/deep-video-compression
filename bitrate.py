@@ -1,4 +1,5 @@
 import os
+import json
 import ffmpeg
 
 from config import *
@@ -9,14 +10,25 @@ for model in MODELS:
     total_file_size = 0
     num_files = 0
 
-    for root, _, files in os.walk('../results/output/av1/' + model + '/depth_0'):
+    for root, _, files in os.walk('../results/output/av1/' + model + '/depth_2'):
         for file in files:
             if file.endswith('.mkv'):
+                r = os.popen('mediainfo {} --Output=JSON'.format(root + '/' + file)).read()
+                j = json.loads(r)
+
+                total_bpp += int(j['media']['track'][0]['OverallBitRate']) / 25 / (256 * 448)
+
+                """
                 print(root + '/' + file)
                 probe = ffmpeg.probe(root + '/' + file)
                 video_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
 
-                total_bpp += int(video_stream['bit_rate']) / 25 / (256 * 448)
+                for key in video_stream.keys():
+                    print(key)
+                input()
+                """
+
+                #total_bpp += int(video_stream['bit_rate']) / 25 / (256 * 448)
 
                 #total_file_size += os.path.getsize(root + '/' + file)
                 num_files += 1
@@ -66,11 +78,11 @@ for model in MODELS:
 
     AV1
     
-       | 0                   | 1                     | 2
-    ---+---------------------+-----------------------+----------------------
-    hi |  |  | 
-    mi |  |  | 
-    lo |  |  | 
+       | 0                   | 1                   | 2
+    ---+---------------------+---------------------+----------------------
+    hi | 0.2826421732584637  | 0.16827388189406642 | 0.10153398931594114
+    mi | 0.21740978509812128 | 0.13130939534505187 | 0.07904325038364952
+    lo | 0.14221282116117925 | 0.08563527221679705 | 0.07904325038364952
     
 """
 
