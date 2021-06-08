@@ -17,7 +17,7 @@ for _, _, files in os.walk(DATASET_DIR):
 
 lpips_model = lpips.LPIPS(verbose=False)
 
-for vid_dir in [MP4_DIR, AV1_DIR]:
+for vid_dir in [MP4_DIR]:  # , AV1_DIR]:
     for model in MODELS:
         for depth in INTERPOLATION_DEPTHS:
             msssim, psnr, lpips = 0, 0, 0

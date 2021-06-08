@@ -10,3 +10,5 @@ EVALUATION_METRICS = ['msssim', 'psnr', 'lpips']
 
 MP4_DIR = './output/mp4'
 AV1_DIR = './output/av1'
+
+JPEG_COMPRESSED_DIR = './output/jpeg'
